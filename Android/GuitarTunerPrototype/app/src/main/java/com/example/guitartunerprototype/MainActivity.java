@@ -5,9 +5,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.AudioEvent;
+import be.tarsos.dsp.AudioProcessor;
+import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+import be.tarsos.dsp.pitch.PitchDetectionHandler;
+import be.tarsos.dsp.pitch.PitchDetectionResult;
+import be.tarsos.dsp.pitch.PitchProcessor;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -27,6 +33,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
+
+        PitchDetectionHandler pdh = new PitchDetectionHandler() {
+            @Override
+            public void handlePitch(PitchDetectionResult pitchDetectionResult, AudioEvent audioEvent) {
+                final float pitchInHz = pitchDetectionResult.getPitch();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        processPitch(pitchInHz);
+                    }
+                });
+            }
+        };
+
+        AudioProcessor pitchProcessor = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
+        dispatcher.addAudioProcessor(pitchProcessor);
+
+        Thread audioThread = new Thread(dispatcher, "Audio Thread");
+        audioThread.start();
+
         Button button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,6 +68,41 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void processPitch(float pitchInHz) {
+        TextView pitchText = findViewById(R.id.pitchText);
+        TextView noteText = findViewById(R.id.noteText);
+        pitchText.setText("" + pitchInHz);
+        if(pitchInHz >= 110 && pitchInHz < 123.47) {
+            //A
+            noteText.setText("A");
+        }
+        else if(pitchInHz >= 123.47 && pitchInHz < 130.81) {
+            //B
+            noteText.setText("B");
+        }
+        else if(pitchInHz >= 130.81 && pitchInHz < 146.83) {
+            //C
+            noteText.setText("C");
+        }
+        else if(pitchInHz >= 146.83 && pitchInHz < 164.81) {
+            //D
+            noteText.setText("D");
+        }
+        else if(pitchInHz >= 164.81 && pitchInHz <= 174.61) {
+            //E
+            noteText.setText("E");
+        }
+        else if(pitchInHz >= 174.61 && pitchInHz < 185) {
+            //F
+            noteText.setText("F");
+        }
+        else if(pitchInHz >= 185 && pitchInHz < 196) {
+            //G
+            noteText.setText("G");
+        }
+    }
+
 
     private void requestPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
@@ -75,26 +137,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    public void doStuff() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_DENIED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, MY_PERMISSION);
-            }
-        }
-    }
-
-    public void changeTextView(Integer bool) {
-        TextView myText = findViewById(R.id.myText);
-        switch (bool) {
-            case 0:
-                myText.setText("GRANTED");
-                break;
-            case 1:
-                myText.setText("DENIED");
-                break;
         }
     }
 }
