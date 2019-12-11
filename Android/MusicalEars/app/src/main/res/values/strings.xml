@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">MusicalEarsAndroid</string>
+    <string name="appTitle">Musical Ears</string>
+    <string name="play">Play</string>
+    <string name="Replay">Replay</string>
+    <string name="m2">Minor 2nd</string>
+    <string name="M2">Major 2nd</string>
+    <string name="m3">Minor 3rd</string>
+    <string name="M3">Major 3rd</string>
+    <string name="p4">Perfect 4th</string>
+    <string name="tri">Tritone</string>
+    <string name="p5">Perfect 5th</string>
+    <string name="m6">Minor 6th</string>
+    <string name="M6">Major 6th</string>
+    <string name="m7">Minor 7th</string>
+    <string name="M7">Major 7th</string>
+    <string name="p8">Octave</string>
+</resources>

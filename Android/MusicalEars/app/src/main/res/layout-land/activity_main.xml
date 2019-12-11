@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/appTitle"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/M2"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="2"
+        android:text="@string/M2"
+        app:layout_constraintBottom_toTopOf="@+id/tri"
+        app:layout_constraintEnd_toStartOf="@+id/m3"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/m2"
+        app:layout_constraintTop_toBottomOf="@+id/play" />
+
+    <Button
+        android:id="@+id/m2"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="1"
+        android:text="@string/m2"
+        app:layout_constraintBottom_toTopOf="@+id/p4"
+        app:layout_constraintEnd_toStartOf="@+id/M2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play" />
+
+    <Button
+        android:id="@+id/m3"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="3"
+        android:text="@string/m3"
+        app:layout_constraintBottom_toTopOf="@+id/p5"
+        app:layout_constraintEnd_toStartOf="@+id/M3"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/M2"
+        app:layout_constraintTop_toBottomOf="@+id/play" />
+
+    <Button
+        android:id="@+id/M3"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="4"
+        android:text="@string/M3"
+        app:layout_constraintBottom_toTopOf="@+id/m6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/m3"
+        app:layout_constraintTop_toBottomOf="@+id/play" />
+
+    <Button
+        android:id="@+id/p4"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="5"
+        android:text="@string/p4"
+        app:layout_constraintBottom_toTopOf="@+id/M6"
+        app:layout_constraintEnd_toStartOf="@+id/tri"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/m2" />
+
+    <Button
+        android:id="@+id/tri"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="6"
+        android:text="@string/tri"
+        app:layout_constraintBottom_toTopOf="@+id/m7"
+        app:layout_constraintEnd_toStartOf="@+id/p5"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/p4"
+        app:layout_constraintTop_toBottomOf="@+id/M2" />
+
+    <Button
+        android:id="@+id/p5"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="7"
+        android:text="@string/p5"
+        app:layout_constraintBottom_toTopOf="@+id/M7"
+        app:layout_constraintEnd_toStartOf="@+id/m6"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tri"
+        app:layout_constraintTop_toBottomOf="@+id/m3" />
+
+    <Button
+        android:id="@+id/m6"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="8"
+        android:text="@string/m6"
+        app:layout_constraintBottom_toTopOf="@+id/p8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/p5"
+        app:layout_constraintTop_toBottomOf="@+id/M3" />
+
+    <Button
+        android:id="@+id/M6"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="9"
+        android:text="@string/M6"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/m7"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/p4" />
+
+    <Button
+        android:id="@+id/m7"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="10"
+        android:text="@string/m7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/M7"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/M6"
+        app:layout_constraintTop_toBottomOf="@+id/tri" />
+
+    <Button
+        android:id="@+id/M7"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="11"
+        android:text="@string/M7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/p8"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/m7"
+        app:layout_constraintTop_toBottomOf="@+id/p5" />
+
+    <Button
+        android:id="@+id/p8"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:onClick="clickedIntervalButton"
+        android:tag="12"
+        android:text="@string/p8"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/M7"
+        app:layout_constraintTop_toBottomOf="@+id/m6" />
+
+    <Button
+        android:id="@+id/play"
+        android:layout_width="140dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/play"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/score"
+        android:layout_width="71dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/replay"
+        android:layout_width="87dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="40dp"
+        android:text="@string/Replay"
+        app:layout_constraintStart_toEndOf="@+id/play"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
