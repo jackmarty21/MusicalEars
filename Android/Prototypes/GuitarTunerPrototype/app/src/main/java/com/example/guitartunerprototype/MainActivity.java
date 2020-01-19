@@ -3,6 +3,7 @@ package com.example.guitartunerprototype;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import be.tarsos.dsp.AudioDispatcher;
@@ -16,9 +17,18 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     private int STORAGE_PERMISSION_CODE = 1;
 
     private static final int MY_PERMISSION = 0;
+
+    private static float[] noteFrequencies = new float[] {(float) 16.35, (float) 17.32, (float) 18.35, (float) 19.45, (float) 20.6, (float) 21.83, (float) 23.12, (float) 24.5, (float) 25.96, (float) 27.5, (float) 29.14, (float) 30.87};
+    private static String[] noteNames = new String[] {"C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,34 +86,59 @@ public class MainActivity extends AppCompatActivity {
         TextView pitchText = findViewById(R.id.pitchText);
         TextView noteText = findViewById(R.id.noteText);
         pitchText.setText("" + pitchInHz);
-        if(pitchInHz >= 110 && pitchInHz < 123.47) {
-            //A
-            noteText.setText("A");
+        if (pitchInHz > 0) {
+            float frequency = pitchInHz;
+            while (frequency > noteFrequencies[noteFrequencies.length - 1]) {
+                frequency /= (float) 2.0;
+            }
+            while (frequency < noteFrequencies[0]) {
+                frequency *= (float) 2.0;
+            }
+            Log.d("freq", String.valueOf(frequency));
+
+
+            float minDistance = (float) 10000.0;
+            int index = 0;
+
+            for (int i=0; i<noteFrequencies.length; i++) {
+                float distance = Math.abs(noteFrequencies[i] - frequency);
+                if (distance < minDistance) {
+                    index = i;
+                    minDistance = distance;
+                }
+            }
+
+            int octave = (int) (Math.log(pitchInHz / frequency)/Math.log(2));
+
+            noteText.setText("" + noteNames[index] + "" + octave);
+            moveImage(pitchInHz);
         }
-        else if(pitchInHz >= 123.47 && pitchInHz < 130.81) {
-            //B
-            noteText.setText("B");
-        }
-        else if(pitchInHz >= 130.81 && pitchInHz < 146.83) {
-            //C
-            noteText.setText("C");
-        }
-        else if(pitchInHz >= 146.83 && pitchInHz < 164.81) {
-            //D
-            noteText.setText("D");
-        }
-        else if(pitchInHz >= 164.81 && pitchInHz <= 174.61) {
-            //E
-            noteText.setText("E");
-        }
-        else if(pitchInHz >= 174.61 && pitchInHz < 185) {
-            //F
-            noteText.setText("F");
-        }
-        else if(pitchInHz >= 185 && pitchInHz < 196) {
-            //G
-            noteText.setText("G");
-        }
+    }
+
+    private void moveImage(final float pitch) {
+
+        final float bias = (float) 1 - ((pitch - 50) / 300);
+
+        Log.d("height", String.valueOf(bias));
+        final ImageView image = findViewById(R.id.imageView);
+
+        Animation animation = new Animation() {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                super.applyTransformation(interpolatedTime, t);
+
+                if (pitch > 0) {
+                    ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)image.getLayoutParams();
+                    params.verticalBias = bias;
+
+                    image.setLayoutParams(params);
+                }
+            }
+        };
+
+        animation.setDuration(1000);
+        image.startAnimation(animation);
+
     }
 
 
