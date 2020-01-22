@@ -20,6 +20,8 @@ class ViewController: UIViewController {
     var tracker: AKFrequencyTracker!
     var silence: AKBooster!
     
+    var randomNote = Int.random(in: 0..<12)
+    
     let noteFrequencies = [16.35, 17.32, 18.35, 19.45, 20.6, 21.83, 23.12, 24.5, 25.96, 27.5, 29.14, 30.87]
     let noteNamesWithSharps = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
     let noteNamesWithFlats = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"]
@@ -51,8 +53,14 @@ class ViewController: UIViewController {
     }
 
     @objc func updateUI() {
-        if tracker.amplitude > 0.05 {
+        
+        if tracker.amplitude > 0.15 {
             frequency.text = String(format: "%0.1f", tracker.frequency)
+            
+            var targetArray = createNewArray()
+            
+            print(noteNamesWithSharps)
+            print(targetArray)
 
             var frequency = Float(tracker.frequency)
             while frequency > Float(noteFrequencies[noteFrequencies.count - 1]) {
@@ -82,6 +90,36 @@ class ViewController: UIViewController {
             //Note.text = "\(noteNamesWithSharps[index])\(octave)"
         }
         amplitude.text = String(format: "%0.2f", tracker.amplitude)
+    }
+    
+    func createNewArray() -> Array<Any>{
+        
+        var indexDiff = randomNote - 5
+        var arr = noteNamesWithSharps
+                
+        //if positive, shift left
+        while (indexDiff > 0) {
+            let first = arr[0]
+            for i in 0..<arr.count - 1 {
+                arr[i] = arr[i + 1]
+            }
+            arr[arr.count - 1] = first
+            
+            indexDiff -= 1
+        }
+            
+        //if negative, shift right
+        while (indexDiff < 0) {
+            let last = arr[arr.count - 1]
+            for i in (1..<arr.count).reversed() {
+                arr[i] = arr[i - 1]
+            }
+            arr[0] = last
+            indexDiff += 1
+        }
+        
+        return arr
+        
     }
 }
 
