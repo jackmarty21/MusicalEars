@@ -15,6 +15,18 @@
 		0060492D23CF81D300D3C13E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0060492B23CF81D300D3C13E /* LaunchScreen.storyboard */; };
 		0060493B23CF886E00D3C13E /* AudioKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0060493923CF886E00D3C13E /* AudioKitUI.framework */; };
 		0060493C23CF886E00D3C13E /* AudioKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0060493A23CF886E00D3C13E /* AudioKit.framework */; };
+		00A3A07C23E0D854001DA720 /* 0.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07023E0D854001DA720 /* 0.wav */; };
+		00A3A07D23E0D854001DA720 /* 1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07123E0D854001DA720 /* 1.wav */; };
+		00A3A07E23E0D854001DA720 /* 7.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07223E0D854001DA720 /* 7.wav */; };
+		00A3A07F23E0D854001DA720 /* 8.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07323E0D854001DA720 /* 8.wav */; };
+		00A3A08023E0D854001DA720 /* 11.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07423E0D854001DA720 /* 11.wav */; };
+		00A3A08123E0D854001DA720 /* 4.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07523E0D854001DA720 /* 4.wav */; };
+		00A3A08223E0D854001DA720 /* 5.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07623E0D854001DA720 /* 5.wav */; };
+		00A3A08323E0D854001DA720 /* 6.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07723E0D854001DA720 /* 6.wav */; };
+		00A3A08423E0D854001DA720 /* 3.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07823E0D854001DA720 /* 3.wav */; };
+		00A3A08523E0D854001DA720 /* 2.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07923E0D854001DA720 /* 2.wav */; };
+		00A3A08623E0D854001DA720 /* 9.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07A23E0D854001DA720 /* 9.wav */; };
+		00A3A08723E0D854001DA720 /* 10.wav in Resources */ = {isa = PBXBuildFile; fileRef = 00A3A07B23E0D854001DA720 /* 10.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +42,18 @@
 		0060493623CF83E200D3C13E /* AudioKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioKitUI.framework; path = ../Prototypes/MusicalEars/MusicalEars/AudioKitUI.framework; sourceTree = "<group>"; };
 		0060493923CF886E00D3C13E /* AudioKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioKitUI.framework; path = MusicalEarsMaster/AudioKitUI.framework; sourceTree = "<group>"; };
 		0060493A23CF886E00D3C13E /* AudioKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioKit.framework; path = MusicalEarsMaster/AudioKit.framework; sourceTree = "<group>"; };
+		00A3A07023E0D854001DA720 /* 0.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 0.wav; path = sounds/0.wav; sourceTree = "<group>"; };
+		00A3A07123E0D854001DA720 /* 1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 1.wav; path = sounds/1.wav; sourceTree = "<group>"; };
+		00A3A07223E0D854001DA720 /* 7.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 7.wav; path = sounds/7.wav; sourceTree = "<group>"; };
+		00A3A07323E0D854001DA720 /* 8.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 8.wav; path = sounds/8.wav; sourceTree = "<group>"; };
+		00A3A07423E0D854001DA720 /* 11.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 11.wav; path = sounds/11.wav; sourceTree = "<group>"; };
+		00A3A07523E0D854001DA720 /* 4.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 4.wav; path = sounds/4.wav; sourceTree = "<group>"; };
+		00A3A07623E0D854001DA720 /* 5.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 5.wav; path = sounds/5.wav; sourceTree = "<group>"; };
+		00A3A07723E0D854001DA720 /* 6.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 6.wav; path = sounds/6.wav; sourceTree = "<group>"; };
+		00A3A07823E0D854001DA720 /* 3.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 3.wav; path = sounds/3.wav; sourceTree = "<group>"; };
+		00A3A07923E0D854001DA720 /* 2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 2.wav; path = sounds/2.wav; sourceTree = "<group>"; };
+		00A3A07A23E0D854001DA720 /* 9.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 9.wav; path = sounds/9.wav; sourceTree = "<group>"; };
+		00A3A07B23E0D854001DA720 /* 10.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = 10.wav; path = sounds/10.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +96,18 @@
 				0060492923CF81D300D3C13E /* Assets.xcassets */,
 				0060492B23CF81D300D3C13E /* LaunchScreen.storyboard */,
 				0060492E23CF81D300D3C13E /* Info.plist */,
+				00A3A07023E0D854001DA720 /* 0.wav */,
+				00A3A07123E0D854001DA720 /* 1.wav */,
+				00A3A07923E0D854001DA720 /* 2.wav */,
+				00A3A07823E0D854001DA720 /* 3.wav */,
+				00A3A07523E0D854001DA720 /* 4.wav */,
+				00A3A07623E0D854001DA720 /* 5.wav */,
+				00A3A07723E0D854001DA720 /* 6.wav */,
+				00A3A07223E0D854001DA720 /* 7.wav */,
+				00A3A07323E0D854001DA720 /* 8.wav */,
+				00A3A07A23E0D854001DA720 /* 9.wav */,
+				00A3A07B23E0D854001DA720 /* 10.wav */,
+				00A3A07423E0D854001DA720 /* 11.wav */,
 			);
 			path = MusicalEarsMaster;
 			sourceTree = "<group>";
@@ -145,7 +181,19 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00A3A08723E0D854001DA720 /* 10.wav in Resources */,
+				00A3A08523E0D854001DA720 /* 2.wav in Resources */,
+				00A3A08423E0D854001DA720 /* 3.wav in Resources */,
+				00A3A08323E0D854001DA720 /* 6.wav in Resources */,
+				00A3A07E23E0D854001DA720 /* 7.wav in Resources */,
+				00A3A08623E0D854001DA720 /* 9.wav in Resources */,
+				00A3A07F23E0D854001DA720 /* 8.wav in Resources */,
+				00A3A08223E0D854001DA720 /* 5.wav in Resources */,
+				00A3A07D23E0D854001DA720 /* 1.wav in Resources */,
+				00A3A08123E0D854001DA720 /* 4.wav in Resources */,
 				0060492D23CF81D300D3C13E /* LaunchScreen.storyboard in Resources */,
+				00A3A08023E0D854001DA720 /* 11.wav in Resources */,
+				00A3A07C23E0D854001DA720 /* 0.wav in Resources */,
 				0060492A23CF81D300D3C13E /* Assets.xcassets in Resources */,
 				0060492823CF81D200D3C13E /* Main.storyboard in Resources */,
 			);

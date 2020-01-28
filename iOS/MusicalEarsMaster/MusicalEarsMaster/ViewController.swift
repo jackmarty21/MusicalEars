@@ -8,13 +8,22 @@
 
 import UIKit
 import AudioKit
+import AVFoundation
 
 class ViewController: UIViewController {
 
     @IBOutlet weak var frequency: UILabel!
     @IBOutlet weak var amplitude: UILabel!
     @IBOutlet weak var Note: UILabel!
+    @IBOutlet weak var targetNote: UILabel!
+    @IBOutlet weak var timerLabel: UILabel!
     
+    var seconds = 3
+    var timer = Timer()
+    var isTimerRunning = false
+    var timerDidStart = false
+    
+    var audioPlayer = AVAudioPlayer()
     
     var mic: AKMicrophone!
     var tracker: AKFrequencyTracker!
@@ -26,6 +35,11 @@ class ViewController: UIViewController {
     let noteNamesWithSharps = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
     let noteNamesWithFlats = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"]
     
+    
+    //Screen Size
+    let screenWidth  = UIScreen.main.fixedCoordinateSpace.bounds.width
+    let screenHeight = UIScreen.main.fixedCoordinateSpace.bounds.height
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -34,6 +48,11 @@ class ViewController: UIViewController {
         mic = AKMicrophone()
         tracker = AKFrequencyTracker(mic)
         silence = AKBooster(tracker, gain: 0)
+        
+        targetNote.text = noteNamesWithSharps[randomNote]
+        Note.text = noteNamesWithSharps[randomNote]
+        Note.center = CGPoint(x: screenWidth/2, y: screenHeight/2)
+        
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -45,57 +64,132 @@ class ViewController: UIViewController {
         } catch {
             AKLog("AudioKit did not start!")
         }
-        Timer.scheduledTimer(timeInterval: 0.1,
+        Timer.scheduledTimer(timeInterval: 0.05,
                              target: self,
                              selector: #selector(ViewController.updateUI),
                              userInfo: nil,
                              repeats: true)
     }
+    
+    @IBAction func playAudio(_ sender: Any) {
+        playSound(fileName: String(randomNote))
+    }
 
     @objc func updateUI() {
         
-        if tracker.amplitude > 0.15 {
+        let targetArrayFrequencies = createNewDoubleArray(array: noteFrequencies)
+        let targetArrayNoteNames = createNewStringArray(array: noteNamesWithSharps)
+        
+        let screenHeightInt = Int(screenHeight)
+        
+        //If micophone heads a volume above this amplitude, continue
+        if tracker.amplitude > 0.01 {
+            
+            //Output frequency text
             frequency.text = String(format: "%0.1f", tracker.frequency)
             
-            var targetArray = createNewArray()
-            
-            print(noteNamesWithSharps)
-            print(targetArray)
-
+            //Divide frequency until base value to identify
             var frequency = Float(tracker.frequency)
-            while frequency > Float(noteFrequencies[noteFrequencies.count - 1]) {
+            while frequency > Float(targetArrayFrequencies[targetArrayFrequencies.count - 1]) {
                 frequency /= 2.0
             }
-            while frequency < Float(noteFrequencies[0]) {
+            while frequency < Float(targetArrayFrequencies[0]) {
                 frequency *= 2.0
             }
+            var roundedFrequency = Float(String(format: "%.3f", frequency))
 
+            //distance = measured-target
+            var distance: Float = 10_000.0
+            var centValue: Float = 0.0
+            var centAmount: Float = 0.0
+            var centAmountInt: Int = 0
+            var y = screenHeightInt/2
+            
+            //minDistance identifies measured frequency
             var minDistance: Float = 10_000.0
             var index = 0
             
-            minDistance = (Float(noteFrequencies[7]) - frequency) * 5
-//            print(minDistance)
-
-//            for i in 0..<noteFrequencies.count {
-//                let distance = fabsf(Float(noteFrequencies[i]) - frequency)
-//                if distance < minDistance {
-//                    index = i
-//                    minDistance = distance
-//                }
-//            }
-            var y = 448 + minDistance
-            Note.center = CGPoint(x: 174, y: CGFloat(y))
+            //Identify the measured frequency note
+            for i in 0..<targetArrayFrequencies.count {
+                let distanceTest = fabsf(Float(targetArrayFrequencies[i]) - roundedFrequency!)
+                if distanceTest < minDistance {
+                    index = i
+                    minDistance = distanceTest
+                }
+            }
             
-            //let octave = Int(log2f(Float(tracker.frequency) / frequency))
-            //Note.text = "\(noteNamesWithSharps[index])\(octave)"
+            //If measured frequency is C and target is a B
+            if index == 0 && randomNote == 11 {
+                roundedFrequency! *= 2
+            }
+            
+            distance = fabsf(Float(targetArrayFrequencies[5]) - roundedFrequency!)
+            
+            //if measured frequency is greater than target note, move UI up
+            if roundedFrequency! > Float(targetArrayFrequencies[5]) {
+                
+                if randomNote == 11 {
+                    centValue = 0.0183
+                }
+                else {
+                    centValue = Float((targetArrayFrequencies[6]-targetArrayFrequencies[5])/100)
+                }
+                
+                centAmount = distance / Float(centValue)
+                centAmountInt = Int(centAmount)
+                
+                if centAmountInt < 100 {
+                    y = y - centAmountInt
+                } else {
+                    y = y - 100
+                }
+                
+            }
+            //if measured frequency is less than target note, move UI down
+            else if roundedFrequency! < Float(targetArrayFrequencies[5]) {
+                centValue = Float((targetArrayFrequencies[5]-targetArrayFrequencies[4])/100)
+                
+                centAmount = distance / Float(centValue)
+                centAmountInt = Int(centAmount)
+                
+                if centAmountInt < 100 {
+                    y = y + centAmountInt
+                } else {
+                    y = y + 100
+                }
+            }
+            //If measured frequency is equal to target, then UI goes in the middle of the screen
+            else {
+                centAmountInt = 0
+                y = screenHeightInt/2
+
+            }
+            //Start or Stop timer based off of cent value
+            if centAmountInt <= 20 && timerDidStart == false {
+                startTimer()
+                timerDidStart = true
+            } else if centAmountInt > 20{
+                timer.invalidate()
+                seconds = 3
+                timerLabel.text = "\(seconds)"
+                timerDidStart = false
+            }
+            
+            //Put UI in center on the x axis and offset y by measured value
+            Note.center = CGPoint(x: screenWidth/2, y: CGFloat(y))
+            
+            //Find octave of measured note
+            let octave = Int(log2f(Float(tracker.frequency) / frequency))
+            Note.text = "\(targetArrayNoteNames[index])\(octave) + \(centAmountInt)"
         }
         amplitude.text = String(format: "%0.2f", tracker.amplitude)
     }
     
-    func createNewArray() -> Array<Any>{
+    //Shift noteNames array left or right
+    func createNewStringArray(array: Array<String>) -> Array<String>{
         
         var indexDiff = randomNote - 5
-        var arr = noteNamesWithSharps
+        var arr = array
                 
         //if positive, shift left
         while (indexDiff > 0) {
@@ -120,6 +214,68 @@ class ViewController: UIViewController {
         
         return arr
         
+    }
+    //Shift noteFrequencies array left or right and have frequencies from greatest to smallest
+    func createNewDoubleArray(array: Array<Double>) -> Array<Double>{
+        
+        var indexDiff = randomNote - 5
+        var arr = array
+                
+        //if positive, shift left
+        while (indexDiff > 0) {
+            let first = arr[0]
+            for i in 0..<arr.count - 1 {
+                arr[i] = arr[i + 1]
+            }
+            arr[arr.count - 1] = first
+            arr[arr.count - 1] *= 2
+            
+            indexDiff -= 1
+        }
+            
+        //if negative, shift right
+        while (indexDiff < 0) {
+            let last = arr[arr.count - 1]
+            for i in (1..<arr.count).reversed() {
+                arr[i] = arr[i - 1]
+            }
+            arr[0] = last
+            arr[0] /= 2
+            indexDiff += 1
+        }
+        
+        return arr
+        
+    }
+    
+    //Code to play sound
+    //Referenced code from https://gist.github.com/cliff538/91b8f8bf818d836e1d9537081d02c580
+    func playSound(fileName : String) {
+        let sound = Bundle.main.url(forResource: fileName, withExtension: "wav")
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: sound!)
+        }
+        catch {
+            print(error)
+        }
+        audioPlayer.play()
+    }
+    //https://medium.com/ios-os-x-development/build-an-stopwatch-with-swift-3-0-c7040818a10f
+    
+    @objc func updateTimer() {
+        if seconds == 0 {
+            timer.invalidate()
+            seconds = 3
+            timerLabel.text = "\(seconds)"
+            timerDidStart = false
+            randomNote = Int.random(in: 0..<12)
+            Note.text = noteNamesWithSharps[randomNote]
+        }
+        seconds -= 1     //This will decrement(count down)the seconds.
+        timerLabel.text = "\(seconds)" //This will update the label.
+    }
+    func startTimer() {
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(ViewController.updateTimer)), userInfo: nil, repeats: true)
     }
 }
 
