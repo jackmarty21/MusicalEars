@@ -89,7 +89,7 @@ class ViewController: UIViewController {
         let screenHeightInt = Int(screenHeight)
         
         //If micophone heads a volume above this amplitude, continue
-        if tracker.amplitude > 0.02 {
+        if tracker.amplitude > 0.1 {
             
 //            print(noteFrequencies)
 //            print(targetArrayFrequencies)
@@ -170,7 +170,7 @@ class ViewController: UIViewController {
             }
             print("cents = \(centAmountInt)")
             //Start or Stop timer based off of cent value
-            if centAmountInt <= 20 && timerDidStart == false {
+            if centAmountInt <= 50 && timerDidStart == false {
                 startTimer()
                 timerDidStart = true
                 
@@ -180,7 +180,7 @@ class ViewController: UIViewController {
                 },
                 completion: nil)
                 
-            } else if centAmountInt > 20{
+            } else if centAmountInt > 50{
                 timer.invalidate()
                 seconds = 3
                 timerLabel.text = "\(seconds)"
