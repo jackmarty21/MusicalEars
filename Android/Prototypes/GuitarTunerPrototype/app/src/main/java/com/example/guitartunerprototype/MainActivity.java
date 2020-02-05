@@ -43,13 +43,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String[] noteNames = new String[] {"C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"};
     private static int[] noteResources = new int[] {R.raw.c4, R.raw.csh4, R.raw.d4, R.raw.dsh4, R.raw.e4, R.raw.f4, R.raw.fsh4, R.raw.g3, R.raw.gsh3, R.raw.a3, R.raw.bb3, R.raw.b3};
 
-    private static float[] adjustedNoteFrequencies;
-    private static String[] adjustedNoteNames;
-    private static int[] adjustedNoteResources;
+    private static float[] adjustedNoteFrequencies = null;
+    private static String[] adjustedNoteNames = null;
+    private static int[] adjustedNoteResources = null;
 
-    private static float baseFrequency;
-    private static float targetLowerFrequency;
-    private static float targetUpperFrequency;
+    private static float baseFrequency = -1;
+    private static float targetLowerFrequency = -1;
+    private static float targetUpperFrequency = -1;
     private static int score = 0;
     private static boolean timerExists = false;
     private static boolean shouldListen = true;
@@ -177,9 +177,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void stopTimer() {
         if (accuracyTimer != null) {
-            accuracyTimer.cancel();
-            accuracyTimer = null;
-
             //The following transition implementation is based on an online tutorial, found at:
             //https://riptutorial.com/android/example/21224/add-transition-or-cross-fade-between-two-images-
             ImageView image = findViewById(R.id.imageView);
@@ -192,6 +189,9 @@ public class MainActivity extends AppCompatActivity {
             transition.startTransition(100);
             Log.d("timer", "stop");
             timerExists = false;
+
+            accuracyTimer.cancel();
+            accuracyTimer = null;
         }
     }
 
@@ -349,30 +349,40 @@ public class MainActivity extends AppCompatActivity {
         TextView noteText = findViewById(R.id.noteText);
 
         //filters out background noise, smoothing out UI
-        if (probability > .9 && pitchInHz > 0) {
+        if (probability > .8 && pitchInHz > 0) {
             //reduces the incoming frequency to base values
             //this allows the user to input the correct tone in any octave
             float frequency = pitchInHz;
+            Log.d("freq", String.valueOf(frequency));
+            int octave = 0;
+
             while (frequency > noteFrequencies[noteFrequencies.length - 1]) {
-                frequency /= (float) 2.0;
-            }
-            while (frequency < noteFrequencies[0]) {
-                frequency *= (float) 2.0;
+                if (frequency < 32) {
+                    frequency = noteFrequencies[11];
+                } else {
+                    frequency /= (float) 2.0;
+                    octave++;
+                    if (frequency < noteFrequencies[0]) {
+                        frequency = noteFrequencies[0];
+                    }
+                }
             }
             baseFrequency = frequency;
+            Log.d("baseFreq", String.valueOf(baseFrequency));
 
             float minDistance = (float) 10000.0;
             int index = 0;
 
             for (int i=0; i<noteFrequencies.length; i++) {
-                float distance = Math.abs(noteFrequencies[i] - frequency);
+                float distance = Math.abs(noteFrequencies[i] - baseFrequency);
                 if (distance < minDistance) {
                     index = i;
                     minDistance = distance;
                 }
             }
 
-            int octave = (int) (Math.log(pitchInHz / frequency)/Math.log(2));
+//            int octave = (int) (Math.log(pitchInHz / frequency)/Math.log(2));
+            Log.d("octave:", String.valueOf(octave));
 
             //if the app is expecting a certain tone, it should show that
             //tone's note name in the bubble. otherwise, show incoming tone's note name.
