@@ -36,8 +36,8 @@ import java.util.Arrays;
 
 
 public class MainActivity extends AppCompatActivity {
-    private int STORAGE_PERMISSION_CODE = 1;
-    private static final int MY_PERMISSION = 0;
+    private static int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
+    private static boolean isRecordPermissionGranted = false;
 
     private static float[] noteFrequencies = new float[] {(float) 16.35, (float) 17.32, (float) 18.35, (float) 19.45, (float) 20.6, (float) 21.83, (float) 23.12, (float) 24.5, (float) 25.96, (float) 27.5, (float) 29.14, (float) 30.87};
     private static final String[] noteNames = new String[] {"C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"};
@@ -60,6 +60,59 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Button permButton = findViewById(R.id.permButton);
+        permButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (checkPermissions()) {
+                    Toast.makeText(MainActivity.this, "Permission GRANTED", Toast.LENGTH_SHORT).show();
+                    startApp();
+                } else {
+                    Toast.makeText(MainActivity.this, "Permission DENIED", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        if (!checkPermissions()) {
+            Toast.makeText(MainActivity.this, "Permission DENIED", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    protected boolean checkPermissions() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            //permission is not granted
+            //should show rationale?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
+                new AlertDialog.Builder(this)
+                        .setMessage("Musical Ears requires access to your microphone in order to provide real-time audio processing. None of the audio is stored, and it will only be used in real-time.")
+                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
+                            }
+                        })
+                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                                isRecordPermissionGranted = false;
+                            }
+                        })
+                        .create().show();
+            } else {
+                //no explanation needed
+                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.RECORD_AUDIO},
+                        PERMISSIONS_REQUEST_RECORD_AUDIO);
+            }
+        } else {
+            isRecordPermissionGranted = true;
+            startApp();
+        }
+        return isRecordPermissionGranted;
+    }
+
+    protected void startApp() {
         //This app uses TarsosDSP to achieve its real-time audio processing capabilities.
         //The TarsosDSP Github repo can be found here: https://github.com/JorenSix/TarsosDSP,
         //and documentation can be found at: https://0110.be/releases/TarsosDSP/TarsosDSP-latest/TarsosDSP-latest-Documentation/
@@ -106,22 +159,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 playRandomTone();
-            }
-        });
-
-        //At some point, permissions for microphone usage have to be handled.
-        //This button initiates the permission check, for further implementation later.
-        Button permButton = findViewById(R.id.permButton);
-        permButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(MainActivity.this,
-                        Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(MainActivity.this, "You have already granted this permission!", Toast.LENGTH_SHORT).show();
-
-                } else {
-                    requestPermission();
-                }
             }
         });
     }
@@ -228,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
         final MediaPlayer mp = MediaPlayer.create(this, resource);
         mp.start();
 
-        //prevents the app from pitch matching itself. After 1000ms,
+        //prevents the app from pitch matching itself. After 1500ms,
         //the random tone will be done playing, so the app should
         //resume listening for inputs through the microphone.
         new android.os.Handler().postDelayed(
@@ -236,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         shouldListen = true;
                     }
-                }, 1000);
+                }, 1500);
     }
 
     private void adjustNotes(int randomNote) {
@@ -431,38 +468,16 @@ public class MainActivity extends AppCompatActivity {
         return bias;
     }
 
-    private void requestPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Permission needed")
-                    .setMessage("This permission is needed for this and that")
-                    .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, MY_PERMISSION);
-                        }
-                    })
-                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    })
-                    .create().show();
-        } else {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.RECORD_AUDIO},
-                    STORAGE_PERMISSION_CODE);
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_PERMISSION_CODE) {
+        if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_SHORT).show();
+                isRecordPermissionGranted = true;
+                startApp();
             } else {
                 Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show();
+                isRecordPermissionGranted = false;
             }
         }
     }
