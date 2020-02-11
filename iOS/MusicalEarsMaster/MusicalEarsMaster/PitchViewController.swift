@@ -10,7 +10,7 @@ import UIKit
 import AudioKit
 import AVFoundation
 
-class ViewController: UIViewController {
+class PitchViewController: UIViewController {
 
 //    @IBOutlet weak var frequency: UILabel!
 //    @IBOutlet weak var amplitude: UILabel!
@@ -28,6 +28,7 @@ class ViewController: UIViewController {
     var scoreCtr = 0
     
     var audioPlayer = AVAudioPlayer()
+
     
     var mic: AKMicrophone!
     var tracker: AKFrequencyTracker!
@@ -48,7 +49,16 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        do {
+            try AudioKit.stop()
+        } catch {
+            print(error)
+        }
+        
         AKSettings.audioInputEnabled = true
+        AKSettings.defaultToSpeaker = true
+        AKSettings.useBluetooth = true
+        
         mic = AKMicrophone()
         tracker = AKFrequencyTracker(mic)
         silence = AKBooster(tracker, gain: 0)
@@ -72,7 +82,7 @@ class ViewController: UIViewController {
         }
         Timer.scheduledTimer(timeInterval: 0.05,
                              target: self,
-                             selector: #selector(ViewController.updateUI),
+                             selector: #selector(PitchViewController.updateUI),
                              userInfo: nil,
                              repeats: true)
     }
@@ -89,7 +99,7 @@ class ViewController: UIViewController {
         let screenHeightInt = Int(screenHeight)
         
         //If micophone heads a volume above this amplitude, continue
-        if tracker.amplitude > 0.1 {
+        if tracker.amplitude > 0.08 {
             
 //            print(noteFrequencies)
 //            print(targetArrayFrequencies)
@@ -180,7 +190,7 @@ class ViewController: UIViewController {
                 },
                 completion: nil)
                 
-            } else if centAmountInt > 50{
+            } else if centAmountInt > 50 {
                 timer.invalidate()
                 seconds = 3
                 timerLabel.text = "\(seconds)"
@@ -283,6 +293,7 @@ class ViewController: UIViewController {
     //Code to play sound
     //Referenced code from https://gist.github.com/cliff538/91b8f8bf818d836e1d9537081d02c580
     func playSound(fileName : String) {
+
         let sound = Bundle.main.url(forResource: fileName, withExtension: "wav")
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: sound!)
@@ -310,7 +321,7 @@ class ViewController: UIViewController {
         
     }
     func startTimer() {
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(ViewController.updateTimer)), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(PitchViewController.updateTimer)), userInfo: nil, repeats: true)
     }
 }
 

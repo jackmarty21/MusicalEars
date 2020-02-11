@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		005840DE23F098B900232F94 /* HomeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005840DD23F098B900232F94 /* HomeController.swift */; };
+		005840E023F1D74F00232F94 /* IntervalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005840DF23F1D74F00232F94 /* IntervalViewController.swift */; };
 		0060492123CF81D200D3C13E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0060492023CF81D200D3C13E /* AppDelegate.swift */; };
 		0060492323CF81D200D3C13E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0060492223CF81D200D3C13E /* SceneDelegate.swift */; };
-		0060492523CF81D200D3C13E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0060492423CF81D200D3C13E /* ViewController.swift */; };
+		0060492523CF81D200D3C13E /* PitchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0060492423CF81D200D3C13E /* PitchViewController.swift */; };
 		0060492823CF81D200D3C13E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0060492623CF81D200D3C13E /* Main.storyboard */; };
 		0060492A23CF81D300D3C13E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0060492923CF81D300D3C13E /* Assets.xcassets */; };
 		0060492D23CF81D300D3C13E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0060492B23CF81D300D3C13E /* LaunchScreen.storyboard */; };
@@ -32,10 +34,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		005840DD23F098B900232F94 /* HomeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeController.swift; sourceTree = "<group>"; };
+		005840DF23F1D74F00232F94 /* IntervalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntervalViewController.swift; sourceTree = "<group>"; };
 		0060491D23CF81D200D3C13E /* MusicalEarsMaster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicalEarsMaster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0060492023CF81D200D3C13E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0060492223CF81D200D3C13E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		0060492423CF81D200D3C13E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		0060492423CF81D200D3C13E /* PitchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PitchViewController.swift; sourceTree = "<group>"; };
 		0060492723CF81D200D3C13E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0060492923CF81D300D3C13E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0060492C23CF81D300D3C13E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -95,8 +99,10 @@
 			children = (
 				0060492023CF81D200D3C13E /* AppDelegate.swift */,
 				0060492223CF81D200D3C13E /* SceneDelegate.swift */,
-				0060492423CF81D200D3C13E /* ViewController.swift */,
+				0060492423CF81D200D3C13E /* PitchViewController.swift */,
+				005840DF23F1D74F00232F94 /* IntervalViewController.swift */,
 				0060492623CF81D200D3C13E /* Main.storyboard */,
+				005840DD23F098B900232F94 /* HomeController.swift */,
 				007E204123E89E9100233985 /* Circle.swift */,
 				007E204523E9E29B00233985 /* GreenCircle.swift */,
 				0060492923CF81D300D3C13E /* Assets.xcassets */,
@@ -212,10 +218,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0060492523CF81D200D3C13E /* ViewController.swift in Sources */,
+				0060492523CF81D200D3C13E /* PitchViewController.swift in Sources */,
 				007E204223E89E9100233985 /* Circle.swift in Sources */,
+				005840DE23F098B900232F94 /* HomeController.swift in Sources */,
 				007E204623E9E29B00233985 /* GreenCircle.swift in Sources */,
 				0060492123CF81D200D3C13E /* AppDelegate.swift in Sources */,
+				005840E023F1D74F00232F94 /* IntervalViewController.swift in Sources */,
 				0060492323CF81D200D3C13E /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
