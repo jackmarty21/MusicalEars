@@ -39,11 +39,14 @@ public class PitchMatchingActivity extends AppCompatActivity {
     private static TargetNote randomNote = null;
     private CountDownTimer accuracyTimer = null;
     private int score;
+    private TextView statusText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pitch_matching);
+        statusText = findViewById(R.id.statusText);
 
         checkPermissions();
     }
@@ -52,6 +55,7 @@ public class PitchMatchingActivity extends AppCompatActivity {
         Log.d("pitch matching", "started");
         Log.d("randomNote", String.valueOf(randomNote));
         shouldListen = true;
+        statusText.setText(R.string.mic_on);
 
         AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
         PitchDetectionHandler pitchDetectionHandler = new PitchDetectionHandler() {
@@ -178,6 +182,7 @@ public class PitchMatchingActivity extends AppCompatActivity {
         final TextView upperText = findViewById(R.id.octaveUpperText);
         final TextView lowerText = findViewById(R.id.octaveLowerText);
         shouldListen = false;
+        statusText.setText("");
 
         int randomNoteIndex;
 
@@ -216,6 +221,7 @@ public class PitchMatchingActivity extends AppCompatActivity {
                 new Runnable() {
                     public void run() {
                         shouldListen = true;
+                        statusText.setText("Now listening through your microphone.");
                     }
                 }, 1500);
 
