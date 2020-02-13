@@ -1,8 +1,6 @@
 package com.example.musicalears;
 
 import android.util.Log;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,14 +11,14 @@ public class Note {
     private int noteResource;
 
     //constructor
-    public Note(int noteId, String noteName, float noteFrequency, int noteResource) {
+    Note(int noteId, String noteName, float noteFrequency, int noteResource) {
         this.noteId = noteId;
         this.noteName = noteName;
         this.noteFrequency = noteFrequency;
         this.noteResource = noteResource;
     }
 
-    public final static List<Note> noteList = new ArrayList<Note>() {{
+    final static List<Note> noteList = new ArrayList<Note>() {{
         add(new Note(0, "C", (float) 16.35, R.raw.c4));
         add(new Note(1, "C♯", (float) 17.32, R.raw.csh4));
         add(new Note(2, "D", (float) 18.35, R.raw.d4));
@@ -35,7 +33,7 @@ public class Note {
         add(new Note(11, "B", (float) 30.87, R.raw.b3));
     }};
 
-    public static List<Note> adjustedNoteList = new ArrayList<Note>() {{
+    static List<Note> adjustedNoteList = new ArrayList<Note>() {{
         add(new Note(0, "C", (float) 16.35, R.raw.c4));
         add(new Note(1, "C♯", (float) 17.32, R.raw.csh4));
         add(new Note(2, "D", (float) 18.35, R.raw.d4));
@@ -50,23 +48,23 @@ public class Note {
         add(new Note(11, "B", (float) 30.87, R.raw.b3));
     }};
 
-    public int getNoteId() {
+    int getNoteId() {
         return noteId;
     }
 
-    public String getNoteName() {
+    String getNoteName() {
         return noteName;
     }
 
-    public float getNoteFrequency() {
+    float getNoteFrequency() {
         return noteFrequency;
     }
 
-    public int getNoteResource() {
+    int getNoteResource() {
         return noteResource;
     }
 
-    public void adjustNotes(int randomNoteIndex) {
+    void adjustNotes(int randomNoteIndex) {
         Log.d("originalArray", noteList.toString());
         int indexDiff = randomNoteIndex - 5;
         if (indexDiff > 0) {
@@ -75,10 +73,6 @@ public class Note {
             shiftArrayRight(Math.abs(indexDiff));
         }
         Log.d("adjustedArray", adjustedNoteList.toString());
-    }
-
-    public String toString() {
-        return this.noteName + " : " + this.noteFrequency;
     }
 
     private void shiftArrayRight(int indexDiff) {
@@ -125,5 +119,9 @@ public class Note {
             firstNote.noteFrequency = firstNote.noteFrequency * 2;
             adjustedNoteList.add(adjustedNoteList.size(), firstNote);
         }
+    }
+
+    public String toString() {
+        return this.noteName + " : " + this.noteFrequency;
     }
 }
