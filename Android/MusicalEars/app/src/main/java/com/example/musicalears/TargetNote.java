@@ -5,8 +5,8 @@ public class TargetNote extends Note {
     private float targetLowerTwenty = -1;
 
     //constructor
-    public TargetNote(int noteId, String noteName, float noteFrequency, int noteResource) {
-        super(noteId, noteName, noteFrequency, noteResource);
+    public TargetNote(String noteName, float noteFrequency, int noteResource) {
+        super(noteName, noteFrequency, noteResource);
     }
 
     public float getTargetLowerTwenty() {

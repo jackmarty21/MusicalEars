@@ -2,4 +2,23 @@
     <string name="app_name">Musical Ears</string>
     <string name="action_settings">Settings</string>
     <string name="mic_on">Now listening through your microphone.</string>
+    <string name="play_button">play button</string>
+    <string name="_0_pts">0 pts</string>
+    <string name="note_bubble">note bubble</string>
+    <string name="c">C</string>
+    <string name="b">B</string>
+    <string name="now_listening">Now listening through your microphone.</string>
+    <string-array name="intervals_array">
+        <item>Minor 2nd</item>
+        <item>Major 2nd</item>
+        <item>Minor 3rd</item>
+        <item>Major 3rd</item>
+        <item>Perfect 4th</item>
+        <item>Tritone</item>
+        <item>Perfect 5th</item>
+        <item>Minor 6th</item>
+        <item>Major 6th</item>
+        <item>Minor 7th</item>
+        <item>Major 7th</item>
+    </string-array>
 </resources>
