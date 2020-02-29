@@ -101,7 +101,7 @@ class IntervalViewController: UIViewController {
         let screenHeightInt = Int(screenHeight)
         
         //If micophone heads a volume above this amplitude, continue
-        if tracker.amplitude > 0.03 {
+        if tracker.amplitude > 0.1 {
             
             //Output frequency text
             print("randomInterval = \(randomInterval)")

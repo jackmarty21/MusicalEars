@@ -74,7 +74,7 @@ class ProcessTone {
         else {
             centAmountInt = 0
         }
-        print("cents = \(centAmountInt)")
+        //print("cents = \(centAmountInt)")
         
         return centAmountInt
     }

@@ -92,9 +92,9 @@
 				005840E723F4603300232F94 /* Notes.swift */,
 				007E204123E89E9100233985 /* Circle.swift */,
 				007E204523E9E29B00233985 /* GreenCircle.swift */,
+				0060492E23CF81D300D3C13E /* Info.plist */,
 				0060492923CF81D300D3C13E /* Assets.xcassets */,
 				0060492B23CF81D300D3C13E /* LaunchScreen.storyboard */,
-				0060492E23CF81D300D3C13E /* Info.plist */,
 				005840E923F473C800232F94 /* sounds */,
 			);
 			path = MusicalEarsMaster;

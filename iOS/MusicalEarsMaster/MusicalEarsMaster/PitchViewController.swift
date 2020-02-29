@@ -17,6 +17,9 @@ class PitchViewController: UIViewController {
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var blueCircle: UIView!
     @IBOutlet weak var greenCircle: UIView!
+    @IBOutlet weak var greenRect: UILabel!
+    @IBOutlet weak var micButton: UIButton!
+    @IBOutlet weak var greenTrailingConstraint: NSLayoutConstraint!
     
     var seconds = 3
     var timer = Timer()
@@ -26,6 +29,7 @@ class PitchViewController: UIViewController {
     var myNotes = Notes()
     var playSoundFiles = PlaySound()
     var processTone = ProcessTone()
+    var micIsOn = false
     
     var mic: AKMicrophone!
     var tracker: AKFrequencyTracker!
@@ -52,14 +56,16 @@ class PitchViewController: UIViewController {
         AKSettings.useBluetooth = true
         
         mic = AKMicrophone()
+        mic.stop()
         tracker = AKFrequencyTracker(mic)
         silence = AKBooster(tracker, gain: 0)
         
+        greenTrailingConstraint.constant = screenWidth - 56
         targetNote.text = myNotes.Notes[randomNote].name
         Note.text = myNotes.Notes[randomNote].name
-        Note.center = CGPoint(x: screenWidth/2, y: screenHeight/2)
-        blueCircle.center = CGPoint(x: screenWidth/2, y: screenHeight/2)
-        greenCircle.center = CGPoint(x: screenWidth/2, y: screenHeight/2)
+        Note.center = CGPoint(x: 40, y: screenHeight/2)
+        blueCircle.center = CGPoint(x: 40, y: screenHeight/2)
+        greenCircle.center = CGPoint(x: 40, y: screenHeight/2)
         
     }
 
@@ -83,17 +89,29 @@ class PitchViewController: UIViewController {
         playSoundFiles.playSound(fileName: String(randomNote))
     }
 
+    @IBAction func micButtonPressed(_ sender: Any) {
+        if micIsOn == true {
+            micIsOn = false
+            micButton.setImage(UIImage(named: "mic_off.jpg"), for: .normal)
+            mic.stop()
+        }
+        else {
+            micIsOn = true
+            micButton.setImage(UIImage(named: "mic_on.jpg"), for: .normal)
+            mic.start()
+        }
+    }
+    
     @objc func updateUI() {
-        
         let targetArray = myNotes.shiftArray(randomNote: randomNote)
         let screenHeightInt = Int(screenHeight)
         
         //If micophone heads a volume above this amplitude, continue
-        if tracker.amplitude > 0.05 {
+        if tracker.amplitude > 0.01 {
         
             //Output frequency text
-            print("frequency = \(tracker.frequency)")
-            print("amplitude = \(tracker.amplitude)")
+//            print("frequency = \(tracker.frequency)")
+//            print("amplitude = \(tracker.amplitude)")
             
             //Set measured values from ProcessTone class
             let frequency = processTone.getBaseFrequency(frequency: Float(tracker.frequency), targetArray: targetArray)
@@ -102,14 +120,25 @@ class PitchViewController: UIViewController {
             let centAmountInt = processTone.getCents(roundedFrequency: roundedFrequency, targetArray: targetArray)
             let y = processTone.getYCoordinate(initialCoordinate: screenHeightInt/2, centAmountInt: centAmountInt, decrement: 200)
             
+
+            UIView.animate(withDuration: 0.2, delay: 0.0, options: [],
+            animations: {
+                //Put UI in center on the x axis and offset y by measured value
+                self.Note.center = CGPoint(x: 40, y: CGFloat(y))
+                self.blueCircle.center = CGPoint(x: 40, y: CGFloat(y))
+                self.greenCircle.center = CGPoint(x: 40, y: CGFloat(y))
+            },
+            completion: nil)
+            
             //Start or Stop timer based off of cent value
             if abs(centAmountInt) <= 50 && timerDidStart == false {
                 startTimer()
                 timerDidStart = true
-                
-                UIView.animate(withDuration: 5.0, delay: 0.0, options: [],
+                greenTrailingConstraint.constant = 0
+                UIView.animate(withDuration: 3.0, delay: 0.0, options: [],
                 animations: {
                     self.blueCircle.alpha = 0
+                    self.view.layoutIfNeeded()
                 },
                 completion: nil)
                 
@@ -118,18 +147,15 @@ class PitchViewController: UIViewController {
                 seconds = 3
                 timerLabel.text = "\(seconds)"
                 timerDidStart = false
+                greenTrailingConstraint.constant = screenWidth - 56
                 
                 UIView.animate(withDuration: 0.01, delay: 0.0, options: [],
                 animations: {
                     self.blueCircle.alpha = 1
+                    self.view.layoutIfNeeded()
                 },
                 completion: nil)
             }
-            
-            //Put UI in center on the x axis and offset y by measured value
-            Note.center = CGPoint(x: screenWidth/2, y: CGFloat(y))
-            blueCircle.center = CGPoint(x: screenWidth/2, y: CGFloat(y))
-            greenCircle.center = CGPoint(x: screenWidth/2, y: CGFloat(y))
             
             //Find octave of measured note
             let octave = Int(log2f(Float(tracker.frequency) / frequency))
@@ -139,10 +165,12 @@ class PitchViewController: UIViewController {
             seconds = 3
             timerLabel.text = "\(seconds)"
             timerDidStart = false
+            greenTrailingConstraint.constant = screenWidth - 56
             
             UIView.animate(withDuration: 0.01, delay: 0.0, options: [],
             animations: {
                 self.blueCircle.alpha = 1
+                self.view.layoutIfNeeded()
             },
             completion: nil)
         }
