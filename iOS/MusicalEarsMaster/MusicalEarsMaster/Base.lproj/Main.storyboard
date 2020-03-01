@@ -10,7 +10,6 @@
         <!--Home-->
         <scene sceneID="bDs-1f-7Pk">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Yd2-sm-Xqc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <tableViewController id="tl5-Gu-cGB" customClass="HomeController" customModule="MusicalEarsMaster" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="LAG-rb-xrg">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
@@ -73,6 +72,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Home" id="JDs-ka-BGi"/>
                 </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Yd2-sm-Xqc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-716" y="94"/>
         </scene>
@@ -243,7 +243,6 @@
         <!--Navigation Controller-->
         <scene sceneID="E3W-aY-Tej">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="VwQ-Nd-ZnN" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <navigationController id="uxR-0U-ItJ" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="TSp-kj-wQE">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -253,6 +252,7 @@
                         <segue destination="tl5-Gu-cGB" kind="relationship" relationship="rootViewController" id="niR-jS-fAC"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="VwQ-Nd-ZnN" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1655" y="94"/>
         </scene>
@@ -353,19 +353,26 @@
                                     <action selector="micButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="OnI-oR-EwF"/>
                                 </connections>
                             </button>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZoR-XI-9Xf" customClass="GreenCircle" customModule="MusicalEarsMaster" customModuleProvider="target">
-                                <rect key="frame" x="70" y="418" width="60" height="60"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </view>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="35Z-Ud-pHq" customClass="Circle" customModule="MusicalEarsMaster" customModuleProvider="target">
-                                <rect key="frame" x="70" y="418" width="60" height="60"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </view>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k1N-TC-5q4">
-                                <rect key="frame" x="20" y="418" width="161" height="60"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="NoteBubbleOn" translatesAutoresizingMaskIntoConstraints="NO" id="tZX-oc-7b4">
+                                <rect key="frame" x="0.0" y="410" width="140" height="76"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="76" id="iG8-Kv-KWP"/>
+                                    <constraint firstAttribute="width" constant="140" id="oiR-cX-Zfj"/>
+                                </constraints>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="NoteBubbleOff" translatesAutoresizingMaskIntoConstraints="NO" id="dDF-CW-OKp">
+                                <rect key="frame" x="0.0" y="410" width="140" height="76"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="76" id="GPH-sh-ZDJ"/>
+                                    <constraint firstAttribute="width" constant="140" id="ZqT-Fb-90r"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k1N-TC-5q4">
+                                <rect key="frame" x="11" y="410" width="75" height="76"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="75" id="Afu-zS-I3f"/>
+                                    <constraint firstAttribute="height" constant="76" id="PQj-WN-oKU"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -379,23 +386,29 @@
                             <constraint firstItem="9dV-Ph-YG5" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="200" id="40Q-Wa-LVn"/>
                             <constraint firstItem="M31-mI-5ee" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="5TY-ng-qoN"/>
                             <constraint firstItem="8Tp-KV-MAg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="6B4-6B-F4v"/>
+                            <constraint firstItem="tZX-oc-7b4" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="70X-4k-Duu"/>
                             <constraint firstItem="btz-BA-ogH" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="9jc-WY-1w6"/>
                             <constraint firstItem="4VP-rp-kuP" firstAttribute="leading" secondItem="Nci-WK-HTc" secondAttribute="trailing" constant="370" id="EsN-MM-iN6"/>
                             <constraint firstItem="9dV-Ph-YG5" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="HdF-1x-vHK"/>
+                            <constraint firstItem="dDF-CW-OKp" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="IOB-qj-cWs"/>
                             <constraint firstItem="Nci-WK-HTc" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="IsS-df-GjX"/>
                             <constraint firstItem="btz-BA-ogH" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="JAe-O3-gyB"/>
+                            <constraint firstItem="k1N-TC-5q4" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="11" id="LXq-7G-JdY"/>
                             <constraint firstItem="bHA-kU-AIw" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="NHE-s3-VkF"/>
                             <constraint firstItem="bWf-cc-qP8" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="100" id="Ncn-kq-hWT"/>
+                            <constraint firstItem="k1N-TC-5q4" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="NdO-ba-Ky6"/>
                             <constraint firstItem="bWf-cc-qP8" firstAttribute="leading" secondItem="aNg-a8-NiS" secondAttribute="trailing" constant="26.5" id="O93-hY-Raw"/>
                             <constraint firstItem="4VP-rp-kuP" firstAttribute="leading" secondItem="hE7-Y3-JZ9" secondAttribute="trailing" constant="20" id="QPU-hi-WrE"/>
                             <constraint firstItem="kHb-vE-nCS" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="5" id="QQ0-Up-0cj"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="aNg-a8-NiS" secondAttribute="bottom" constant="50" id="Y3I-cO-z5l"/>
                             <constraint firstItem="4VP-rp-kuP" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="asG-6Z-Ios"/>
                             <constraint firstItem="btz-BA-ogH" firstAttribute="top" secondItem="9dV-Ph-YG5" secondAttribute="bottom" id="bpG-5n-Zzz"/>
+                            <constraint firstItem="tZX-oc-7b4" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="bpg-NG-Vnx"/>
                             <constraint firstItem="btz-BA-ogH" firstAttribute="top" secondItem="9dV-Ph-YG5" secondAttribute="bottom" id="duM-PK-9GB"/>
                             <constraint firstAttribute="trailing" secondItem="bWf-cc-qP8" secondAttribute="trailing" constant="100" id="fSi-bc-SVa"/>
                             <constraint firstItem="Nci-WK-HTc" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="gNS-Oo-xgR"/>
                             <constraint firstItem="bHA-kU-AIw" firstAttribute="top" secondItem="M31-mI-5ee" secondAttribute="bottom" id="hKE-pG-jLd"/>
+                            <constraint firstItem="dDF-CW-OKp" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="j24-SG-Ut8"/>
                             <constraint firstItem="M31-mI-5ee" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="j2N-uF-RoL"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="bWf-cc-qP8" secondAttribute="bottom" constant="50" id="m3n-Ad-XYC"/>
                             <constraint firstItem="hE7-Y3-JZ9" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="nSb-ex-m7l"/>
@@ -415,11 +428,14 @@
                     <navigationItem key="navigationItem" title="Pitch Identification" id="Rp0-nt-EJ9"/>
                     <connections>
                         <outlet property="Note" destination="k1N-TC-5q4" id="OEm-RX-rEU"/>
-                        <outlet property="blueCircle" destination="35Z-Ud-pHq" id="i8j-rV-cxL"/>
-                        <outlet property="greenCircle" destination="ZoR-XI-9Xf" id="Fxk-Ex-5xd"/>
                         <outlet property="greenRect" destination="Nci-WK-HTc" id="9Ur-dA-hQ6"/>
                         <outlet property="greenTrailingConstraint" destination="EsN-MM-iN6" id="tjh-IU-q8D"/>
+                        <outlet property="imageOffConstraint" destination="j24-SG-Ut8" id="039-yD-nbo"/>
+                        <outlet property="imageOnConstraint" destination="bpg-NG-Vnx" id="2Nm-K0-ph2"/>
                         <outlet property="micButton" destination="aNg-a8-NiS" id="B0i-cc-CFG"/>
+                        <outlet property="noteConstraint" destination="NdO-ba-Ky6" id="N09-0g-VO4"/>
+                        <outlet property="noteImageOff" destination="dDF-CW-OKp" id="Pdd-8Y-hcG"/>
+                        <outlet property="noteImageOn" destination="tZX-oc-7b4" id="9yA-TL-snW"/>
                         <outlet property="scoreLabel" destination="8Tp-KV-MAg" id="KmK-D7-m4S"/>
                         <outlet property="targetNote" destination="4VP-rp-kuP" id="f4U-fa-qV1"/>
                         <outlet property="timerLabel" destination="kHb-vE-nCS" id="vAL-yq-qhL"/>
@@ -431,9 +447,11 @@
         </scene>
     </scenes>
     <resources>
+        <image name="NoteBubbleOff" width="400" height="264"/>
+        <image name="NoteBubbleOn" width="400" height="264"/>
         <image name="PlayButton" width="834" height="209"/>
         <image name="mic" catalog="system" width="54" height="64"/>
-        <image name="mic_off" width="4109" height="4109"/>
+        <image name="mic_off" width="500" height="500"/>
         <image name="music.mic" catalog="system" width="64" height="58"/>
         <image name="play.circle" catalog="system" width="64" height="60"/>
     </resources>

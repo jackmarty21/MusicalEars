@@ -15,10 +15,13 @@ class PitchViewController: UIViewController {
     @IBOutlet weak var targetNote: UILabel!
     @IBOutlet weak var timerLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
-    @IBOutlet weak var blueCircle: UIView!
-    @IBOutlet weak var greenCircle: UIView!
+    @IBOutlet weak var noteImageOff: UIImageView!
+    @IBOutlet weak var noteImageOn: UIImageView!
     @IBOutlet weak var greenRect: UILabel!
     @IBOutlet weak var micButton: UIButton!
+    @IBOutlet weak var noteConstraint: NSLayoutConstraint!
+    @IBOutlet weak var imageOnConstraint: NSLayoutConstraint!
+    @IBOutlet weak var imageOffConstraint: NSLayoutConstraint!
     @IBOutlet weak var greenTrailingConstraint: NSLayoutConstraint!
     
     var seconds = 3
@@ -64,8 +67,8 @@ class PitchViewController: UIViewController {
         targetNote.text = myNotes.Notes[randomNote].name
         Note.text = myNotes.Notes[randomNote].name
         Note.center = CGPoint(x: 40, y: screenHeight/2)
-        blueCircle.center = CGPoint(x: 40, y: screenHeight/2)
-        greenCircle.center = CGPoint(x: 40, y: screenHeight/2)
+        noteImageOff.center = CGPoint(x: 40, y: screenHeight/2)
+        noteImageOff.center = CGPoint(x: 40, y: screenHeight/2)
         
     }
 
@@ -120,13 +123,13 @@ class PitchViewController: UIViewController {
             let centAmountInt = processTone.getCents(roundedFrequency: roundedFrequency, targetArray: targetArray)
             let y = processTone.getYCoordinate(initialCoordinate: screenHeightInt/2, centAmountInt: centAmountInt, decrement: 200)
             
-
+            imageOnConstraint.constant = CGFloat(y)
+            imageOffConstraint.constant = CGFloat(y)
+            noteConstraint.constant = CGFloat(y)
             UIView.animate(withDuration: 0.2, delay: 0.0, options: [],
             animations: {
                 //Put UI in center on the x axis and offset y by measured value
-                self.Note.center = CGPoint(x: 40, y: CGFloat(y))
-                self.blueCircle.center = CGPoint(x: 40, y: CGFloat(y))
-                self.greenCircle.center = CGPoint(x: 40, y: CGFloat(y))
+                self.view.layoutIfNeeded()
             },
             completion: nil)
             
@@ -137,7 +140,7 @@ class PitchViewController: UIViewController {
                 greenTrailingConstraint.constant = 0
                 UIView.animate(withDuration: 3.0, delay: 0.0, options: [],
                 animations: {
-                    self.blueCircle.alpha = 0
+                    self.noteImageOff.alpha = 0
                     self.view.layoutIfNeeded()
                 },
                 completion: nil)
@@ -151,7 +154,7 @@ class PitchViewController: UIViewController {
                 
                 UIView.animate(withDuration: 0.01, delay: 0.0, options: [],
                 animations: {
-                    self.blueCircle.alpha = 1
+                    self.noteImageOff.alpha = 1
                     self.view.layoutIfNeeded()
                 },
                 completion: nil)
@@ -169,7 +172,7 @@ class PitchViewController: UIViewController {
             
             UIView.animate(withDuration: 0.01, delay: 0.0, options: [],
             animations: {
-                self.blueCircle.alpha = 1
+                self.noteImageOff.alpha = 1
                 self.view.layoutIfNeeded()
             },
             completion: nil)
