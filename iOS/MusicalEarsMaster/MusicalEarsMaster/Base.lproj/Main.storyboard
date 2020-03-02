@@ -299,9 +299,10 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hE7-Y3-JZ9">
-                                <rect key="frame" x="20" y="447" width="351.5" height="2"/>
+                                <rect key="frame" x="20" y="447" width="0.0" height="2"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <constraints>
+                                    <constraint firstAttribute="width" id="IR4-wA-lIv"/>
                                     <constraint firstAttribute="height" constant="2" id="mfp-ZZ-sEo"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -309,10 +310,11 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nci-WK-HTc">
-                                <rect key="frame" x="20" y="446" width="1.5" height="4"/>
+                                <rect key="frame" x="20" y="443" width="0.0" height="10"/>
                                 <color key="backgroundColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="4" id="sIb-OH-ALi"/>
+                                    <constraint firstAttribute="width" id="eQ5-wb-4Bl"/>
+                                    <constraint firstAttribute="height" constant="10" id="sIb-OH-ALi"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -388,7 +390,6 @@
                             <constraint firstItem="8Tp-KV-MAg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="6B4-6B-F4v"/>
                             <constraint firstItem="tZX-oc-7b4" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="70X-4k-Duu"/>
                             <constraint firstItem="btz-BA-ogH" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="9jc-WY-1w6"/>
-                            <constraint firstItem="4VP-rp-kuP" firstAttribute="leading" secondItem="Nci-WK-HTc" secondAttribute="trailing" constant="370" id="EsN-MM-iN6"/>
                             <constraint firstItem="9dV-Ph-YG5" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="HdF-1x-vHK"/>
                             <constraint firstItem="dDF-CW-OKp" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="IOB-qj-cWs"/>
                             <constraint firstItem="Nci-WK-HTc" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="IsS-df-GjX"/>
@@ -398,7 +399,6 @@
                             <constraint firstItem="bWf-cc-qP8" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="100" id="Ncn-kq-hWT"/>
                             <constraint firstItem="k1N-TC-5q4" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="NdO-ba-Ky6"/>
                             <constraint firstItem="bWf-cc-qP8" firstAttribute="leading" secondItem="aNg-a8-NiS" secondAttribute="trailing" constant="26.5" id="O93-hY-Raw"/>
-                            <constraint firstItem="4VP-rp-kuP" firstAttribute="leading" secondItem="hE7-Y3-JZ9" secondAttribute="trailing" constant="20" id="QPU-hi-WrE"/>
                             <constraint firstItem="kHb-vE-nCS" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="5" id="QQ0-Up-0cj"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="aNg-a8-NiS" secondAttribute="bottom" constant="50" id="Y3I-cO-z5l"/>
                             <constraint firstItem="4VP-rp-kuP" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="asG-6Z-Ios"/>
@@ -428,8 +428,8 @@
                     <navigationItem key="navigationItem" title="Pitch Identification" id="Rp0-nt-EJ9"/>
                     <connections>
                         <outlet property="Note" destination="k1N-TC-5q4" id="OEm-RX-rEU"/>
-                        <outlet property="greenRect" destination="Nci-WK-HTc" id="9Ur-dA-hQ6"/>
-                        <outlet property="greenTrailingConstraint" destination="EsN-MM-iN6" id="tjh-IU-q8D"/>
+                        <outlet property="blackWidthConstraint" destination="IR4-wA-lIv" id="SHy-f9-Ng1"/>
+                        <outlet property="greenWidthConstraint" destination="eQ5-wb-4Bl" id="t3K-7h-Ngu"/>
                         <outlet property="imageOffConstraint" destination="j24-SG-Ut8" id="039-yD-nbo"/>
                         <outlet property="imageOnConstraint" destination="bpg-NG-Vnx" id="2Nm-K0-ph2"/>
                         <outlet property="micButton" destination="aNg-a8-NiS" id="B0i-cc-CFG"/>

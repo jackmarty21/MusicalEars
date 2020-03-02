@@ -17,12 +17,12 @@ class PitchViewController: UIViewController {
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var noteImageOff: UIImageView!
     @IBOutlet weak var noteImageOn: UIImageView!
-    @IBOutlet weak var greenRect: UILabel!
     @IBOutlet weak var micButton: UIButton!
     @IBOutlet weak var noteConstraint: NSLayoutConstraint!
     @IBOutlet weak var imageOnConstraint: NSLayoutConstraint!
     @IBOutlet weak var imageOffConstraint: NSLayoutConstraint!
-    @IBOutlet weak var greenTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var greenWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var blackWidthConstraint: NSLayoutConstraint!
     
     var seconds = 3
     var timer = Timer()
@@ -43,10 +43,16 @@ class PitchViewController: UIViewController {
     //Screen Size
     let screenWidth  = UIScreen.main.fixedCoordinateSpace.bounds.width
     let screenHeight = UIScreen.main.fixedCoordinateSpace.bounds.height
+    var labelWidth = CGFloat()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        labelWidth = screenWidth - 60
+        blackWidthConstraint.constant = labelWidth
+
         
         do {
             try AudioKit.stop()
@@ -63,7 +69,6 @@ class PitchViewController: UIViewController {
         tracker = AKFrequencyTracker(mic)
         silence = AKBooster(tracker, gain: 0)
         
-        greenTrailingConstraint.constant = screenWidth - 56
         targetNote.text = myNotes.Notes[randomNote].name
         Note.text = myNotes.Notes[randomNote].name
         Note.center = CGPoint(x: 40, y: screenHeight/2)
@@ -89,7 +94,19 @@ class PitchViewController: UIViewController {
     }
     
     @IBAction func playAudio(_ sender: Any) {
-        playSoundFiles.playSound(fileName: String(randomNote))
+        if (micIsOn == true) {
+            micIsOn = false
+            mic.stop()
+            micButton.setImage(UIImage(named: "mic_off.jpg"), for: .normal)
+            playSoundFiles.playSound(fileName: String(randomNote))
+            sleep(2)
+            mic.start()
+            micButton.setImage(UIImage(named: "mic_on.jpg"), for: .normal)
+            micIsOn = true
+        }
+        else {
+            playSoundFiles.playSound(fileName: String(randomNote))
+        }
     }
 
     @IBAction func micButtonPressed(_ sender: Any) {
@@ -110,25 +127,21 @@ class PitchViewController: UIViewController {
         let screenHeightInt = Int(screenHeight)
         
         //If micophone heads a volume above this amplitude, continue
-        if tracker.amplitude > 0.01 {
-        
-            //Output frequency text
-//            print("frequency = \(tracker.frequency)")
-//            print("amplitude = \(tracker.amplitude)")
+        if tracker.amplitude > 0.03 {
             
             //Set measured values from ProcessTone class
             let frequency = processTone.getBaseFrequency(frequency: Float(tracker.frequency), targetArray: targetArray)
             let roundedFrequency = Float(String(format: "%.3f", frequency))
             let index = processTone.getMeasuredFreqIndex(targetArray: targetArray, roundedFrequency: roundedFrequency)
             let centAmountInt = processTone.getCents(roundedFrequency: roundedFrequency, targetArray: targetArray)
-            let y = processTone.getYCoordinate(initialCoordinate: screenHeightInt/2, centAmountInt: centAmountInt, decrement: 200)
+            let y = processTone.getYCoordinate(initialCoordinate: screenHeightInt/2, centAmountInt: centAmountInt, decrement: 200-40)
             
             imageOnConstraint.constant = CGFloat(y)
             imageOffConstraint.constant = CGFloat(y)
             noteConstraint.constant = CGFloat(y)
+            
             UIView.animate(withDuration: 0.2, delay: 0.0, options: [],
             animations: {
-                //Put UI in center on the x axis and offset y by measured value
                 self.view.layoutIfNeeded()
             },
             completion: nil)
@@ -137,10 +150,16 @@ class PitchViewController: UIViewController {
             if abs(centAmountInt) <= 50 && timerDidStart == false {
                 startTimer()
                 timerDidStart = true
-                greenTrailingConstraint.constant = 0
-                UIView.animate(withDuration: 3.0, delay: 0.0, options: [],
+                greenWidthConstraint.constant = labelWidth
+                //greenOffAnimate.stopAnimation(true)
+                //greenOnAnimate.startAnimation()
+                //self.view.layer.removeAllAnimations()
+                UIView.animate(withDuration: 3.7, delay: 0.0, options: [.curveLinear],
                 animations: {
                     self.noteImageOff.alpha = 0
+                    NSLayoutConstraint.deactivate([self.greenWidthConstraint])
+                    self.greenWidthConstraint.constant = self.labelWidth
+                    NSLayoutConstraint.activate([self.greenWidthConstraint])
                     self.view.layoutIfNeeded()
                 },
                 completion: nil)
@@ -150,11 +169,12 @@ class PitchViewController: UIViewController {
                 seconds = 3
                 timerLabel.text = "\(seconds)"
                 timerDidStart = false
-                greenTrailingConstraint.constant = screenWidth - 56
-                
-                UIView.animate(withDuration: 0.01, delay: 0.0, options: [],
+                UIView.animate(withDuration: .2, delay: 0.0, options: [.curveLinear],
                 animations: {
                     self.noteImageOff.alpha = 1
+                    NSLayoutConstraint.deactivate([self.greenWidthConstraint])
+                    self.greenWidthConstraint.constant = 0
+                    NSLayoutConstraint.activate([self.greenWidthConstraint])
                     self.view.layoutIfNeeded()
                 },
                 completion: nil)
@@ -168,11 +188,13 @@ class PitchViewController: UIViewController {
             seconds = 3
             timerLabel.text = "\(seconds)"
             timerDidStart = false
-            greenTrailingConstraint.constant = screenWidth - 56
-            
-            UIView.animate(withDuration: 0.01, delay: 0.0, options: [],
+
+            UIView.animate(withDuration: 0.2, delay: 0.0, options: [.curveLinear],
             animations: {
                 self.noteImageOff.alpha = 1
+                NSLayoutConstraint.deactivate([self.greenWidthConstraint])
+                self.greenWidthConstraint.constant = 0
+                NSLayoutConstraint.activate([self.greenWidthConstraint])
                 self.view.layoutIfNeeded()
             },
             completion: nil)
@@ -184,6 +206,10 @@ class PitchViewController: UIViewController {
     
     @objc func updateTimer() {
         if seconds == 0 {
+//            greenOnAnimate.stopAnimation(true)
+            //greenOffAnimate.startAnimation()
+            //self.view.layer.removeAllAnimations()
+            greenWidthConstraint.constant = 0
             timer.invalidate()
             seconds = 3
             timerLabel.text = "\(seconds)"
