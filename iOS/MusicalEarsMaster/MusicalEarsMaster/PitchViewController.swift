@@ -11,24 +11,23 @@ import AudioKit
 
 class PitchViewController: UIViewController {
 
-    @IBOutlet weak var Note: UILabel!
-    @IBOutlet weak var targetNote: UILabel!
     @IBOutlet weak var timerLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
-    @IBOutlet weak var noteImageOff: UIImageView!
-    @IBOutlet weak var noteImageOn: UIImageView!
     @IBOutlet weak var micButton: UIButton!
-    @IBOutlet weak var noteConstraint: NSLayoutConstraint!
-    @IBOutlet weak var imageOnConstraint: NSLayoutConstraint!
-    @IBOutlet weak var imageOffConstraint: NSLayoutConstraint!
-    @IBOutlet weak var greenWidthConstraint: NSLayoutConstraint!
-    @IBOutlet weak var blackWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var animationView: UIView!
     
+    let BASEAMPLITUDE = 0.03
+    
+    var AnimationController : ImageAnimation!
     var seconds = 3
     var timer = Timer()
+    var countingTimer = Timer()
     var timerDidStart = false
+    var countingTimerStarted = false
     var scoreCtr = 0
+    var countingTimerSeconds = 0
     
+    var myColors = Colors()
     var myNotes = Notes()
     var playSoundFiles = PlaySound()
     var processTone = ProcessTone()
@@ -41,19 +40,22 @@ class PitchViewController: UIViewController {
     var randomNote = Int.random(in: 0..<12)
     
     //Screen Size
-    let screenWidth  = UIScreen.main.fixedCoordinateSpace.bounds.width
-    let screenHeight = UIScreen.main.fixedCoordinateSpace.bounds.height
     var labelWidth = CGFloat()
+    var height = CGFloat()
+    var width = CGFloat()
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        labelWidth = screenWidth - 60
-        blackWidthConstraint.constant = labelWidth
-
+        animationView.layer.borderWidth = 3
+        animationView.layer.cornerRadius = 10
+        animationView.layer.borderColor = myColors.primaryDarkBorder.cgColor
+        scoreLabel.textColor = myColors.primaryDarkText
+        timerLabel.textColor = myColors.primaryDarkText
         
+                
         do {
             try AudioKit.stop()
         } catch {
@@ -69,17 +71,14 @@ class PitchViewController: UIViewController {
         tracker = AKFrequencyTracker(mic)
         silence = AKBooster(tracker, gain: 0)
         
-        targetNote.text = myNotes.Notes[randomNote].name
-        Note.text = myNotes.Notes[randomNote].name
-        Note.center = CGPoint(x: 40, y: screenHeight/2)
-        noteImageOff.center = CGPoint(x: 40, y: screenHeight/2)
-        noteImageOff.center = CGPoint(x: 40, y: screenHeight/2)
-        
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        height = self.animationView.frame.size.height
+        width = self.animationView.frame.size.width
+        
         AudioKit.output = silence
         do {
             try AudioKit.start()
@@ -93,7 +92,22 @@ class PitchViewController: UIViewController {
                              repeats: true)
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ToAnimation" {
+            AnimationController = (segue.destination as! ImageAnimation)
+        }
+    }
+    
+    @IBAction func nextNote(_ sender: Any) {
+        randomNote = Int.random(in: 0..<12)
+        AnimationController.targetNote.text = myNotes.Notes[randomNote].name
+    }
+    
     @IBAction func playAudio(_ sender: Any) {
+        if countingTimerStarted == false {
+            countingTimerStarted = true
+            startCountingTimer()
+        }
         if (micIsOn == true) {
             micIsOn = false
             mic.stop()
@@ -124,80 +138,41 @@ class PitchViewController: UIViewController {
     
     @objc func updateUI() {
         let targetArray = myNotes.shiftArray(randomNote: randomNote)
-        let screenHeightInt = Int(screenHeight)
+        
+        if AnimationController != nil {
+            AnimationController.height = height
+            AnimationController.labelWidth = width-83
+            AnimationController.targetNote.text = myNotes.Notes[randomNote].name
+        }
+        //Set measured values from ProcessTone class
+        let frequency = processTone.getBaseFrequency(frequency: Float(tracker.frequency), targetArray: targetArray)
+        let roundedFrequency = Float(String(format: "%.3f", frequency))
+        let index = processTone.getMeasuredFreqIndex(targetArray: targetArray, roundedFrequency: roundedFrequency)
+        let centAmountInt = processTone.getCents(roundedFrequency: roundedFrequency, targetArray: targetArray)
+        let y = processTone.getYCoordinate(centAmountInt: centAmountInt, decrement: (Int(height)/2)-40)
+        
+        AnimationController.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: 3.3)
         
         //If micophone heads a volume above this amplitude, continue
-        if tracker.amplitude > 0.03 {
-            
-            //Set measured values from ProcessTone class
-            let frequency = processTone.getBaseFrequency(frequency: Float(tracker.frequency), targetArray: targetArray)
-            let roundedFrequency = Float(String(format: "%.3f", frequency))
-            let index = processTone.getMeasuredFreqIndex(targetArray: targetArray, roundedFrequency: roundedFrequency)
-            let centAmountInt = processTone.getCents(roundedFrequency: roundedFrequency, targetArray: targetArray)
-            let y = processTone.getYCoordinate(initialCoordinate: screenHeightInt/2, centAmountInt: centAmountInt, decrement: 200-40)
-            
-            imageOnConstraint.constant = CGFloat(y)
-            imageOffConstraint.constant = CGFloat(y)
-            noteConstraint.constant = CGFloat(y)
-            
-            UIView.animate(withDuration: 0.2, delay: 0.0, options: [],
-            animations: {
-                self.view.layoutIfNeeded()
-            },
-            completion: nil)
-            
+        if tracker.amplitude > BASEAMPLITUDE {
             //Start or Stop timer based off of cent value
             if abs(centAmountInt) <= 50 && timerDidStart == false {
                 startTimer()
                 timerDidStart = true
-                greenWidthConstraint.constant = labelWidth
-                //greenOffAnimate.stopAnimation(true)
-                //greenOnAnimate.startAnimation()
-                //self.view.layer.removeAllAnimations()
-                UIView.animate(withDuration: 3.7, delay: 0.0, options: [.curveLinear],
-                animations: {
-                    self.noteImageOff.alpha = 0
-                    NSLayoutConstraint.deactivate([self.greenWidthConstraint])
-                    self.greenWidthConstraint.constant = self.labelWidth
-                    NSLayoutConstraint.activate([self.greenWidthConstraint])
-                    self.view.layoutIfNeeded()
-                },
-                completion: nil)
                 
             } else if abs(centAmountInt) > 50 {
                 timer.invalidate()
                 seconds = 3
-                timerLabel.text = "\(seconds)"
                 timerDidStart = false
-                UIView.animate(withDuration: .2, delay: 0.0, options: [.curveLinear],
-                animations: {
-                    self.noteImageOff.alpha = 1
-                    NSLayoutConstraint.deactivate([self.greenWidthConstraint])
-                    self.greenWidthConstraint.constant = 0
-                    NSLayoutConstraint.activate([self.greenWidthConstraint])
-                    self.view.layoutIfNeeded()
-                },
-                completion: nil)
             }
             
             //Find octave of measured note
             let octave = Int(log2f(Float(tracker.frequency) / frequency))
-            Note.text = "\(targetArray[index].name)\(octave)"
+            AnimationController.noteLabel.text = "\(targetArray[index].name)\(octave)"
         } else {
             timer.invalidate()
             seconds = 3
-            timerLabel.text = "\(seconds)"
             timerDidStart = false
-
-            UIView.animate(withDuration: 0.2, delay: 0.0, options: [.curveLinear],
-            animations: {
-                self.noteImageOff.alpha = 1
-                NSLayoutConstraint.deactivate([self.greenWidthConstraint])
-                self.greenWidthConstraint.constant = 0
-                NSLayoutConstraint.activate([self.greenWidthConstraint])
-                self.view.layoutIfNeeded()
-            },
-            completion: nil)
         }
         
     }
@@ -206,25 +181,29 @@ class PitchViewController: UIViewController {
     
     @objc func updateTimer() {
         if seconds == 0 {
-//            greenOnAnimate.stopAnimation(true)
-            //greenOffAnimate.startAnimation()
-            //self.view.layer.removeAllAnimations()
-            greenWidthConstraint.constant = 0
+            AnimationController.animateImageOff()
             timer.invalidate()
             seconds = 3
-            timerLabel.text = "\(seconds)"
             timerDidStart = false
             randomNote = Int.random(in: 0..<12)
-            targetNote.text = myNotes.Notes[randomNote].name
+            AnimationController.targetNote.text = myNotes.Notes[randomNote].name
             scoreCtr += 1
             scoreLabel.text = "\(scoreCtr) pts"
         }
         seconds -= 1     //This will decrement(count down)the seconds.
-        timerLabel.text = "\(seconds)" //This will update the label.
         
     }
     func startTimer() {
         timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(PitchViewController.updateTimer)), userInfo: nil, repeats: true)
+    }
+    @objc func updateCountingTimer() {
+        countingTimerSeconds += 1
+        let minutes = Int(countingTimerSeconds) / 60 % 60
+        let seconds = Int(countingTimerSeconds) % 60
+        timerLabel.text = String(format:"%02i:%02i", minutes, seconds)
+    }
+    func startCountingTimer() {
+        countingTimer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(PitchViewController.updateCountingTimer)), userInfo: nil, repeats: true)
     }
 }
 

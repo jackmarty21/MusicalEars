@@ -12,22 +12,25 @@ import AVFoundation
 
 class IntervalViewController: UIViewController {
 
-    
-    @IBOutlet weak var targetNote: UILabel!
-    @IBOutlet weak var intervalTargetNote: UILabel!
-    @IBOutlet weak var Note: UILabel!
+    @IBOutlet weak var micButton: UIButton!
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var timerLabel: UILabel!
     @IBOutlet weak var intervalTimerLabel: UILabel!
-    @IBOutlet weak var blueCircle: UIView!
-    @IBOutlet weak var greenCircle: UIView!
+    @IBOutlet weak var animationViewTop: UIView!
+    @IBOutlet weak var animationViewBottom: UIView!
     
+    let BASEAMPLITUDE = 0.1
+    
+    var AnimationControllerTop : ImageAnimation!
+    var AnimationControllerBottom : ImageAnimation!
+    var myColors = Colors()
     var baseSeconds = 1
     var intervalSeconds = 3
     var baseTimerDidStart = false
     var intervalTimerDidStart = false
     var scoreCtr = 0
     var isIntervalTest = false
+    var micIsOn = false
     
     var myNotes = Notes()
     var playSoundFiles = PlaySound()
@@ -44,12 +47,24 @@ class IntervalViewController: UIViewController {
     var randomUpDown = Int.random(in: 0..<2)
     
     //Screen Size
-    let screenWidth  = UIScreen.main.fixedCoordinateSpace.bounds.width
-    let screenHeight = UIScreen.main.fixedCoordinateSpace.bounds.height
+    var labelWidth = CGFloat()
+    var heightTop = CGFloat()
+    var widthTop = CGFloat()
+    var heightBottom = CGFloat()
+    var widthBottom = CGFloat()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        animationViewTop.layer.borderWidth = 3
+        animationViewTop.layer.cornerRadius = 10
+        animationViewTop.layer.borderColor = myColors.primaryDarkBorder.cgColor
+        animationViewBottom.layer.borderWidth = 3
+        animationViewBottom.layer.cornerRadius = 10
+        animationViewBottom.layer.borderColor = myColors.primaryDarkBorder.cgColor
+        scoreLabel.textColor = myColors.primaryDarkText
+        timerLabel.textColor = myColors.primaryDarkText
         
         do {
             try AudioKit.stop()
@@ -62,14 +77,10 @@ class IntervalViewController: UIViewController {
         AKSettings.useBluetooth = true
         
         mic = AKMicrophone()
+        mic.stop()
         tracker = AKFrequencyTracker(mic)
         silence = AKBooster(tracker, gain: 0)
-        
-        targetNote.text = myNotes.Notes[randomNote].name
-        Note.text = myNotes.Notes[randomNote].name
-        Note.center = CGPoint(x: screenWidth/2, y: 1.8*screenHeight/2-40)
-        blueCircle.center = CGPoint(x: screenWidth/2, y: 1.8*screenHeight/2-40)
-        greenCircle.center = CGPoint(x: screenWidth/2, y: 1.8*screenHeight/2-40)
+
         
     }
 
@@ -87,26 +98,64 @@ class IntervalViewController: UIViewController {
                              selector: #selector(PitchViewController.updateUI),
                              userInfo: nil,
                              repeats: true)
+        
+        heightTop = self.animationViewTop.frame.size.height
+        widthTop = self.animationViewTop.frame.size.width
+        heightBottom = self.animationViewBottom.frame.size.height
+        widthBottom = self.animationViewBottom.frame.size.width
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ToAnimationTop" {
+            AnimationControllerTop = (segue.destination as! ImageAnimation)
+        }
+        if segue.identifier == "ToAnimationBottom" {
+            AnimationControllerBottom = (segue.destination as! ImageAnimation)
+        }
     }
     
     @IBAction func playAudio(_ sender: Any) {
         playSoundFiles.playSound(fileName: String(randomNote))
     }
+    
+    @IBAction func nextNote(_ sender: Any) {
+        randomNote = Int.random(in: 0..<12)
+        randomInterval = Int.random(in: 1..<12)
+        randomUpDown = Int.random(in: 0..<2)
+        AnimationControllerTop.targetNote.text = myNotes.Notes[randomInterval].name
+        AnimationControllerBottom.targetNote.text = myNotes.Notes[randomNote].name
+    }
 
+    @IBAction func micButtonPressed(_ sender: Any) {
+        if micIsOn == true {
+            micIsOn = false
+            micButton.setImage(UIImage(named: "mic_off.jpg"), for: .normal)
+            mic.stop()
+        }
+        else {
+            micIsOn = true
+            micButton.setImage(UIImage(named: "mic_on.jpg"), for: .normal)
+            mic.start()
+        }
+    }
+    
     @objc func updateUI() {
         
         let baseTargetArray = myNotes.shiftArray(randomNote: randomNote)
         let intervalTargetArray = myNotes.shiftArray(randomNote: randomNote+randomInterval)
-        intervalTargetNote.text = intervalTargetArray[5].name
-        let screenHeightInt = Int(screenHeight)
+        if AnimationControllerTop != nil {
+            AnimationControllerTop.height = heightTop
+            AnimationControllerTop.labelWidth = widthTop-83
+            AnimationControllerTop.targetNote.text = myNotes.Notes[randomInterval].name
+        }
+        if AnimationControllerBottom != nil {
+            AnimationControllerBottom.height = heightBottom
+            AnimationControllerBottom.labelWidth = widthBottom-83
+            AnimationControllerBottom.targetNote.text = myNotes.Notes[randomNote].name
+        }
         
         //If micophone heads a volume above this amplitude, continue
-        if tracker.amplitude > 0.1 {
-            
-            //Output frequency text
-            print("randomInterval = \(randomInterval)")
-            print("frequency = \(tracker.frequency)")
-            print("amplitude = \(tracker.amplitude)")
+        if tracker.amplitude > BASEAMPLITUDE {
             
             let frequency : Float
             let roundedFrequency : Float?
@@ -120,84 +169,50 @@ class IntervalViewController: UIViewController {
                 roundedFrequency = Float(String(format: "%.3f", frequency))
                 index = processTone.getMeasuredFreqIndex(targetArray: intervalTargetArray, roundedFrequency: roundedFrequency)
                 centAmountInt = processTone.getCents(roundedFrequency: roundedFrequency, targetArray: intervalTargetArray)
-                y = processTone.getYCoordinate(initialCoordinate: screenHeightInt/2, centAmountInt: centAmountInt, decrement: 100)
+                y = processTone.getYCoordinate(centAmountInt: centAmountInt, decrement: Int(heightTop/2-40))
+                
+                AnimationControllerTop.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: 3.3)
                 
                 //Start or Stop timer based off of cent value
                 if abs(centAmountInt) <= 50 && intervalTimerDidStart == false {
                     startIntervalTimer()
                     intervalTimerDidStart = true
                     
-                    UIView.animate(withDuration: 5.0, delay: 0.0, options: [],
-                    animations: {
-                        self.blueCircle.alpha = 0
-                    },
-                    completion: nil)
-                    
                 } else if abs(centAmountInt) > 50 {
                     intervalTimer.invalidate()
-                    
                     intervalTimerDidStart = false
-                    
-                    UIView.animate(withDuration: 0.01, delay: 0.0, options: [],
-                    animations: {
-                        self.blueCircle.alpha = 1
-                    },
-                    completion: nil)
                 }
                 //Find octave of measured note
                 let octave = Int(log2f(Float(tracker.frequency) / frequency))
-                Note.text = "\(intervalTargetArray[index].name)\(octave)"
+                AnimationControllerTop.noteLabel.text = "\(intervalTargetArray[index].name)\(octave)"
             } else {
                 //Set measured values from ProcessTone class
                 frequency = processTone.getBaseFrequency(frequency: Float(tracker.frequency), targetArray: baseTargetArray)
                 roundedFrequency = Float(String(format: "%.3f", frequency))
                index = processTone.getMeasuredFreqIndex(targetArray: baseTargetArray, roundedFrequency: roundedFrequency)
                 centAmountInt = processTone.getCents(roundedFrequency: roundedFrequency, targetArray: baseTargetArray)
-                y = processTone.getYCoordinate(initialCoordinate: Int(1.8*screenHeightInt/2-40), centAmountInt: centAmountInt, decrement: 100)
+                y = processTone.getYCoordinate(centAmountInt: centAmountInt, decrement: Int(heightBottom/2-40))
+                
+                AnimationControllerBottom.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: 1.3)
                 
                 //Start or Stop timer based off of cent value
                 if abs(centAmountInt) <= 50 && baseTimerDidStart == false {
                     startBaseTimer()
                     baseTimerDidStart = true
                     
-                    UIView.animate(withDuration: 5.0, delay: 0.0, options: [],
-                    animations: {
-                        self.blueCircle.alpha = 0
-                    },
-                    completion: nil)
-                    
                 } else if abs(centAmountInt) > 50 {
                     baseTimer.invalidate()
                     baseSeconds = 1
-                    timerLabel.text = "\(baseSeconds)"
                     baseTimerDidStart = false
-                    
-                    UIView.animate(withDuration: 0.01, delay: 0.0, options: [],
-                    animations: {
-                        self.blueCircle.alpha = 1
-                    },
-                    completion: nil)
                 }
                 //Find octave of measured note
                 let octave = Int(log2f(Float(tracker.frequency) / frequency))
-                Note.text = "\(baseTargetArray[index].name)\(octave)"
+                AnimationControllerBottom.noteLabel.text = "\(baseTargetArray[index].name)\(octave)"
             }
-            
-            //Put UI in center on the x axis and offset y by measured value
-            Note.center = CGPoint(x: screenWidth/2, y: CGFloat(y))
-            blueCircle.center = CGPoint(x: screenWidth/2, y: CGFloat(y))
-            greenCircle.center = CGPoint(x: screenWidth/2, y: CGFloat(y))
         } else {
             baseTimer.invalidate()
             baseSeconds = 1
-            timerLabel.text = "\(baseSeconds)"
             baseTimerDidStart = false
-            
-            UIView.animate(withDuration: 0.01, delay: 0.0, options: [],
-            animations: {
-                self.blueCircle.alpha = 1
-            },
-            completion: nil)
         }
         
     }
@@ -209,7 +224,6 @@ class IntervalViewController: UIViewController {
         if baseSeconds == 0 && isIntervalTest == false {
             baseTimer.invalidate()
             baseSeconds = 10
-            timerLabel.text = "\(baseSeconds)"
             baseTimerDidStart = false
             isIntervalTest = true
             startBaseTimer()
@@ -219,15 +233,14 @@ class IntervalViewController: UIViewController {
             baseTimer.invalidate()
             intervalTimer.invalidate()
             baseSeconds = 1
-            timerLabel.text = "\(baseSeconds)"
             intervalSeconds = 3
-            intervalTimerLabel.text = "\(intervalSeconds)"
             baseTimerDidStart = false
             intervalTimerDidStart = false
             isIntervalTest = false
         }
+        print("baseSeconds = \(baseSeconds)")
+        print("intervalSeconds = \(intervalSeconds)")
         baseSeconds -= 1     //This will decrement(count down)the seconds.
-        timerLabel.text = "\(baseSeconds)" //This will update the label.
         
     }
     @objc func updateIntervalTimer() {
@@ -236,20 +249,17 @@ class IntervalViewController: UIViewController {
             baseTimer.invalidate()
             intervalTimer.invalidate()
             baseSeconds = 1
-            timerLabel.text = "\(baseSeconds)"
             intervalSeconds = 3
-            intervalTimerLabel.text = "\(intervalSeconds)"
             baseTimerDidStart = false
             intervalTimerDidStart = false
             isIntervalTest = false
             randomNote = Int.random(in: 0..<12)
             randomInterval = Int.random(in: 1..<12)
-            targetNote.text = myNotes.Notes[randomNote].name
+            AnimationControllerTop.targetNote.text = myNotes.Notes[randomNote].name
             scoreCtr += 1
             scoreLabel.text = "\(scoreCtr) pts"
         }
         intervalSeconds -= 1     //This will decrement(count down)the seconds.
-        intervalTimerLabel.text = "\(intervalSeconds)"
     }
     func startBaseTimer() {
         baseTimer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(IntervalViewController.updateBaseTimer)), userInfo: nil, repeats: true)

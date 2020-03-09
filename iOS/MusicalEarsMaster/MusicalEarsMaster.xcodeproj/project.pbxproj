@@ -13,6 +13,8 @@
 		005840EA23F473C800232F94 /* sounds in Resources */ = {isa = PBXBuildFile; fileRef = 005840E923F473C800232F94 /* sounds */; };
 		005840EC23F4757900232F94 /* PlaySound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005840EB23F4757900232F94 /* PlaySound.swift */; };
 		005840EE23F4799F00232F94 /* ProcessTone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005840ED23F4799F00232F94 /* ProcessTone.swift */; };
+		005B96FC24102A2600254DFE /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005B96FB24102A2600254DFE /* Colors.swift */; };
+		005B970424108C7800254DFE /* ImageAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005B970324108C7800254DFE /* ImageAnimation.swift */; };
 		0060492123CF81D200D3C13E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0060492023CF81D200D3C13E /* AppDelegate.swift */; };
 		0060492323CF81D200D3C13E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0060492223CF81D200D3C13E /* SceneDelegate.swift */; };
 		0060492523CF81D200D3C13E /* PitchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0060492423CF81D200D3C13E /* PitchViewController.swift */; };
@@ -21,8 +23,6 @@
 		0060492D23CF81D300D3C13E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0060492B23CF81D300D3C13E /* LaunchScreen.storyboard */; };
 		0060493B23CF886E00D3C13E /* AudioKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0060493923CF886E00D3C13E /* AudioKitUI.framework */; };
 		0060493C23CF886E00D3C13E /* AudioKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0060493A23CF886E00D3C13E /* AudioKit.framework */; };
-		007E204223E89E9100233985 /* Circle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007E204123E89E9100233985 /* Circle.swift */; };
-		007E204623E9E29B00233985 /* GreenCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 007E204523E9E29B00233985 /* GreenCircle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +32,8 @@
 		005840E923F473C800232F94 /* sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sounds; sourceTree = "<group>"; };
 		005840EB23F4757900232F94 /* PlaySound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaySound.swift; sourceTree = "<group>"; };
 		005840ED23F4799F00232F94 /* ProcessTone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessTone.swift; sourceTree = "<group>"; };
+		005B96FB24102A2600254DFE /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		005B970324108C7800254DFE /* ImageAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageAnimation.swift; sourceTree = "<group>"; };
 		0060491D23CF81D200D3C13E /* MusicalEarsMaster.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicalEarsMaster.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0060492023CF81D200D3C13E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0060492223CF81D200D3C13E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -44,8 +46,6 @@
 		0060493623CF83E200D3C13E /* AudioKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioKitUI.framework; path = ../Prototypes/MusicalEars/MusicalEars/AudioKitUI.framework; sourceTree = "<group>"; };
 		0060493923CF886E00D3C13E /* AudioKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioKitUI.framework; path = MusicalEarsMaster/AudioKitUI.framework; sourceTree = "<group>"; };
 		0060493A23CF886E00D3C13E /* AudioKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioKit.framework; path = MusicalEarsMaster/AudioKit.framework; sourceTree = "<group>"; };
-		007E204123E89E9100233985 /* Circle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Circle.swift; sourceTree = "<group>"; };
-		007E204523E9E29B00233985 /* GreenCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreenCircle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,12 +86,12 @@
 				005840DD23F098B900232F94 /* HomeController.swift */,
 				0060492423CF81D200D3C13E /* PitchViewController.swift */,
 				005840DF23F1D74F00232F94 /* IntervalViewController.swift */,
+				005B970324108C7800254DFE /* ImageAnimation.swift */,
 				0060492623CF81D200D3C13E /* Main.storyboard */,
 				005840ED23F4799F00232F94 /* ProcessTone.swift */,
 				005840EB23F4757900232F94 /* PlaySound.swift */,
 				005840E723F4603300232F94 /* Notes.swift */,
-				007E204123E89E9100233985 /* Circle.swift */,
-				007E204523E9E29B00233985 /* GreenCircle.swift */,
+				005B96FB24102A2600254DFE /* Colors.swift */,
 				0060492E23CF81D300D3C13E /* Info.plist */,
 				0060492923CF81D300D3C13E /* Assets.xcassets */,
 				0060492B23CF81D300D3C13E /* LaunchScreen.storyboard */,
@@ -184,11 +184,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				0060492523CF81D200D3C13E /* PitchViewController.swift in Sources */,
+				005B96FC24102A2600254DFE /* Colors.swift in Sources */,
 				005840EC23F4757900232F94 /* PlaySound.swift in Sources */,
-				007E204223E89E9100233985 /* Circle.swift in Sources */,
 				005840EE23F4799F00232F94 /* ProcessTone.swift in Sources */,
+				005B970424108C7800254DFE /* ImageAnimation.swift in Sources */,
 				005840DE23F098B900232F94 /* HomeController.swift in Sources */,
-				007E204623E9E29B00233985 /* GreenCircle.swift in Sources */,
 				0060492123CF81D200D3C13E /* AppDelegate.swift in Sources */,
 				005840E023F1D74F00232F94 /* IntervalViewController.swift in Sources */,
 				0060492323CF81D200D3C13E /* SceneDelegate.swift in Sources */,

@@ -79,21 +79,21 @@ class ProcessTone {
         return centAmountInt
     }
     
-    func getYCoordinate (initialCoordinate: Int, centAmountInt: Int, decrement: Int) -> Int {
+    func getYCoordinate (centAmountInt: Int, decrement: Int) -> Int {
         
         var y = 0
         
         if centAmountInt > decrement {
-            y = y - decrement
+            y = -decrement
         }
         else if centAmountInt < -decrement {
-            y = y + decrement
+            y = decrement
         }
-        else if (centAmountInt < decrement && centAmountInt > 0) || (centAmountInt < 0 && centAmountInt > -decrement) {
+        else if (centAmountInt <= decrement && centAmountInt > 0) || (centAmountInt < 0 && centAmountInt >= -decrement) {
             y = y - centAmountInt
         }
         else  {
-            y = initialCoordinate
+            y = 0
         }
         
         return y
