@@ -20,12 +20,15 @@ class IntervalViewController: UIViewController {
     @IBOutlet weak var animationViewBottom: UIView!
     
     let BASEAMPLITUDE = 0.1
+    let INTERVALSECONDS = 2
+    let BASESECONDS1 = 1
+    let BASESECONDS2 = 10
     
     var AnimationControllerTop : ImageAnimation!
     var AnimationControllerBottom : ImageAnimation!
     var myColors = Colors()
-    var baseSeconds = 1
-    var intervalSeconds = 3
+    var baseSeconds = Int()
+    var intervalSeconds = Int()
     var baseTimerDidStart = false
     var intervalTimerDidStart = false
     var scoreCtr = 0
@@ -65,6 +68,9 @@ class IntervalViewController: UIViewController {
         animationViewBottom.layer.borderColor = myColors.primaryDarkBorder.cgColor
         scoreLabel.textColor = myColors.primaryDarkText
         timerLabel.textColor = myColors.primaryDarkText
+        
+        intervalSeconds = INTERVALSECONDS
+        baseSeconds = BASESECONDS1
         
         do {
             try AudioKit.stop()
@@ -146,7 +152,7 @@ class IntervalViewController: UIViewController {
         if AnimationControllerTop != nil {
             AnimationControllerTop.height = heightTop
             AnimationControllerTop.labelWidth = widthTop-83
-            AnimationControllerTop.targetNote.text = myNotes.Notes[randomInterval].name
+            AnimationControllerTop.targetNote.text = intervalTargetArray[5].name
         }
         if AnimationControllerBottom != nil {
             AnimationControllerBottom.height = heightBottom
@@ -173,12 +179,15 @@ class IntervalViewController: UIViewController {
                 
                 AnimationControllerTop.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: 3.3)
                 
+                print("randomInterval = \(randomInterval)")
                 //Start or Stop timer based off of cent value
                 if abs(centAmountInt) <= 50 && intervalTimerDidStart == false {
+                    print("Interval Timer Started")
                     startIntervalTimer()
                     intervalTimerDidStart = true
                     
                 } else if abs(centAmountInt) > 50 {
+                    //print("Interval Timer Stopped")
                     intervalTimer.invalidate()
                     intervalTimerDidStart = false
                 }
@@ -197,12 +206,14 @@ class IntervalViewController: UIViewController {
                 
                 //Start or Stop timer based off of cent value
                 if abs(centAmountInt) <= 50 && baseTimerDidStart == false {
+                    print("Base Timer Started")
                     startBaseTimer()
                     baseTimerDidStart = true
                     
                 } else if abs(centAmountInt) > 50 {
+                    print("Base Timer Stopped")
                     baseTimer.invalidate()
-                    baseSeconds = 1
+                    baseSeconds = BASESECONDS1
                     baseTimerDidStart = false
                 }
                 //Find octave of measured note
@@ -211,7 +222,7 @@ class IntervalViewController: UIViewController {
             }
         } else {
             baseTimer.invalidate()
-            baseSeconds = 1
+            baseSeconds = BASESECONDS1
             baseTimerDidStart = false
         }
         
@@ -223,7 +234,7 @@ class IntervalViewController: UIViewController {
         //user got base note correct
         if baseSeconds == 0 && isIntervalTest == false {
             baseTimer.invalidate()
-            baseSeconds = 10
+            baseSeconds = BASESECONDS2
             baseTimerDidStart = false
             isIntervalTest = true
             startBaseTimer()
@@ -232,14 +243,13 @@ class IntervalViewController: UIViewController {
         else if baseSeconds == 0 && isIntervalTest == true {
             baseTimer.invalidate()
             intervalTimer.invalidate()
-            baseSeconds = 1
-            intervalSeconds = 3
+            baseSeconds = BASESECONDS1
+            intervalSeconds = INTERVALSECONDS
             baseTimerDidStart = false
             intervalTimerDidStart = false
             isIntervalTest = false
         }
         print("baseSeconds = \(baseSeconds)")
-        print("intervalSeconds = \(intervalSeconds)")
         baseSeconds -= 1     //This will decrement(count down)the seconds.
         
     }
@@ -248,8 +258,8 @@ class IntervalViewController: UIViewController {
         if intervalSeconds == 0 {
             baseTimer.invalidate()
             intervalTimer.invalidate()
-            baseSeconds = 1
-            intervalSeconds = 3
+            baseSeconds = BASESECONDS1
+            intervalSeconds = INTERVALSECONDS
             baseTimerDidStart = false
             intervalTimerDidStart = false
             isIntervalTest = false
@@ -259,6 +269,7 @@ class IntervalViewController: UIViewController {
             scoreCtr += 1
             scoreLabel.text = "\(scoreCtr) pts"
         }
+        print("intervalSeconds = \(intervalSeconds)")
         intervalSeconds -= 1     //This will decrement(count down)the seconds.
     }
     func startBaseTimer() {

@@ -296,7 +296,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cR0-kl-3Q1">
-                                <rect key="frame" x="207" y="448" width="0.0" height="0.0"/>
+                                <rect key="frame" x="207" y="475" width="0.0" height="0.0"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -350,13 +350,13 @@
                                 </connections>
                             </button>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Hd-yn-i44">
-                                <rect key="frame" x="16" y="158.5" width="382" height="273.5"/>
+                                <rect key="frame" x="16" y="158.5" width="382" height="300.5"/>
                                 <connections>
                                     <segue destination="NY0-Zd-YgU" kind="embed" identifier="ToAnimationTop" id="cez-G5-EPd"/>
                                 </connections>
                             </containerView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IJK-l0-xcS">
-                                <rect key="frame" x="16" y="464" width="382" height="316"/>
+                                <rect key="frame" x="16" y="491" width="382" height="289"/>
                                 <connections>
                                     <segue destination="AVg-EY-bru" kind="embed" identifier="ToAnimationBottom" id="1m5-6L-365"/>
                                 </connections>
@@ -379,7 +379,7 @@
                             <constraint firstItem="0Hd-yn-i44" firstAttribute="leading" secondItem="UWF-44-zdR" secondAttribute="leading" constant="16" id="coy-VC-zSP"/>
                             <constraint firstItem="Wgl-vx-MT4" firstAttribute="top" secondItem="IJK-l0-xcS" secondAttribute="bottom" constant="16" id="eTt-WU-Emk"/>
                             <constraint firstItem="U1g-gZ-Suy" firstAttribute="leading" secondItem="UWF-44-zdR" secondAttribute="leading" constant="16" id="lPS-fa-GVe"/>
-                            <constraint firstItem="cR0-kl-3Q1" firstAttribute="centerY" secondItem="SVx-v7-7bq" secondAttribute="centerY" id="q0m-Yc-qGc"/>
+                            <constraint firstItem="cR0-kl-3Q1" firstAttribute="centerY" secondItem="UWF-44-zdR" secondAttribute="centerY" id="q0m-Yc-qGc"/>
                             <constraint firstItem="UWF-44-zdR" firstAttribute="trailing" secondItem="IJK-l0-xcS" secondAttribute="trailing" constant="16" id="r9M-Jy-nIx"/>
                             <constraint firstItem="UWF-44-zdR" firstAttribute="bottom" secondItem="Lih-vW-EjL" secondAttribute="bottom" constant="16" id="rJK-pq-rS8"/>
                             <constraint firstItem="UWF-44-zdR" firstAttribute="bottom" secondItem="Wdf-J9-TCl" secondAttribute="bottom" constant="16" id="xdb-A2-MS1"/>
