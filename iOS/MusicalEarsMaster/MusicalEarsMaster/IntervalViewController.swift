@@ -15,14 +15,15 @@ class IntervalViewController: UIViewController {
     @IBOutlet weak var micButton: UIButton!
     @IBOutlet weak var scoreLabel: UILabel!
     @IBOutlet weak var timerLabel: UILabel!
+    @IBOutlet weak var intervalLabel: UILabel!
     @IBOutlet weak var intervalTimerLabel: UILabel!
     @IBOutlet weak var animationViewTop: UIView!
     @IBOutlet weak var animationViewBottom: UIView!
     
-    let BASEAMPLITUDE = 0.1
+    let BASEAMPLITUDE = 0.01
     let INTERVALSECONDS = 2
     let BASESECONDS1 = 1
-    let BASESECONDS2 = 10
+    let BASESECONDS2 = 11
     
     var AnimationControllerTop : ImageAnimation!
     var AnimationControllerBottom : ImageAnimation!
@@ -45,9 +46,9 @@ class IntervalViewController: UIViewController {
     var tracker: AKFrequencyTracker!
     var silence: AKBooster!
     
-    var randomNote = Int.random(in: 0..<12)
-    var randomInterval = Int.random(in: 1..<12)
-    var randomUpDown = Int.random(in: 0..<2)
+    var randomNote = Int()
+    var randomInterval = Int()
+    var randomUpDown = Int()
     
     //Screen Size
     var labelWidth = CGFloat()
@@ -55,6 +56,8 @@ class IntervalViewController: UIViewController {
     var widthTop = CGFloat()
     var heightBottom = CGFloat()
     var widthBottom = CGFloat()
+    
+    var intervalNames = ["Minor Second", "Major Second", "Minor Third", "Major Third", "Perfect Fourth", "Tritone", "Perfect Fifth", "Minor Sixth", "Major Sixth", "Minor Seventh", "Major Seventh"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,9 +71,12 @@ class IntervalViewController: UIViewController {
         animationViewBottom.layer.borderColor = myColors.primaryDarkBorder.cgColor
         scoreLabel.textColor = myColors.primaryDarkText
         timerLabel.textColor = myColors.primaryDarkText
+        intervalLabel.textColor = myColors.primaryDarkText
         
         intervalSeconds = INTERVALSECONDS
         baseSeconds = BASESECONDS1
+        
+        generateRandoms()
         
         do {
             try AudioKit.stop()
@@ -125,11 +131,10 @@ class IntervalViewController: UIViewController {
     }
     
     @IBAction func nextNote(_ sender: Any) {
-        randomNote = Int.random(in: 0..<12)
-        randomInterval = Int.random(in: 1..<12)
-        randomUpDown = Int.random(in: 0..<2)
-        AnimationControllerTop.targetNote.text = myNotes.Notes[randomInterval].name
-        AnimationControllerBottom.targetNote.text = myNotes.Notes[randomNote].name
+        generateRandoms()
+        
+        AnimationControllerTop.targetNote.text = myNotes.Notes[(randomInterval+8) % 12].name
+        AnimationControllerBottom.targetNote.text = myNotes.Notes[(randomNote+8) % 12].name
     }
 
     @IBAction func micButtonPressed(_ sender: Any) {
@@ -147,8 +152,18 @@ class IntervalViewController: UIViewController {
     
     @objc func updateUI() {
         
-        let baseTargetArray = myNotes.shiftArray(randomNote: randomNote)
-        let intervalTargetArray = myNotes.shiftArray(randomNote: randomNote+randomInterval)
+        let baseTargetArray = myNotes.shiftArray(randomNote: (randomNote+8) % 12)
+        var intervalTargetArray = [Note]()
+        if randomUpDown == 1 {
+            intervalTargetArray = myNotes.shiftArray(randomNote: ((randomNote+8) % 12)+randomInterval)
+
+            intervalLabel.text = "\(intervalNames[randomInterval-1]) Above"
+        }
+        if randomUpDown == 0 {
+            intervalTargetArray = myNotes.shiftArray(randomNote: ((randomNote+8) % 12)-randomInterval)
+
+            intervalLabel.text = "\(intervalNames[randomInterval-1]) Down"
+        }
         if AnimationControllerTop != nil {
             AnimationControllerTop.height = heightTop
             AnimationControllerTop.labelWidth = widthTop-83
@@ -157,7 +172,7 @@ class IntervalViewController: UIViewController {
         if AnimationControllerBottom != nil {
             AnimationControllerBottom.height = heightBottom
             AnimationControllerBottom.labelWidth = widthBottom-83
-            AnimationControllerBottom.targetNote.text = myNotes.Notes[randomNote].name
+            AnimationControllerBottom.targetNote.text = myNotes.Notes[(randomNote+8) % 12].name
         }
         
         //If micophone heads a volume above this amplitude, continue
@@ -177,12 +192,10 @@ class IntervalViewController: UIViewController {
                 centAmountInt = processTone.getCents(roundedFrequency: roundedFrequency, targetArray: intervalTargetArray)
                 y = processTone.getYCoordinate(centAmountInt: centAmountInt, decrement: Int(heightTop/2-40))
                 
-                AnimationControllerTop.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: 3.3)
+                AnimationControllerTop.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: 2.3)
                 
-                print("randomInterval = \(randomInterval)")
                 //Start or Stop timer based off of cent value
                 if abs(centAmountInt) <= 50 && intervalTimerDidStart == false {
-                    print("Interval Timer Started")
                     startIntervalTimer()
                     intervalTimerDidStart = true
                     
@@ -206,12 +219,10 @@ class IntervalViewController: UIViewController {
                 
                 //Start or Stop timer based off of cent value
                 if abs(centAmountInt) <= 50 && baseTimerDidStart == false {
-                    print("Base Timer Started")
                     startBaseTimer()
                     baseTimerDidStart = true
                     
                 } else if abs(centAmountInt) > 50 {
-                    print("Base Timer Stopped")
                     baseTimer.invalidate()
                     baseSeconds = BASESECONDS1
                     baseTimerDidStart = false
@@ -226,6 +237,16 @@ class IntervalViewController: UIViewController {
             baseTimerDidStart = false
         }
         
+    }
+    func generateRandoms() {
+        randomInterval = Int.random(in: 1..<12)
+        randomUpDown = Int.random(in: 0..<2)
+        
+        if (randomUpDown == 1) {
+            randomNote = Int.random(in: 0..<(23-randomInterval))
+        } else {
+            randomNote = Int.random(in: (0+randomInterval)..<23)
+        }
     }
     
     //https://medium.com/ios-os-x-development/build-an-stopwatch-with-swift-3-0-c7040818a10f
@@ -249,9 +270,7 @@ class IntervalViewController: UIViewController {
             intervalTimerDidStart = false
             isIntervalTest = false
         }
-        print("baseSeconds = \(baseSeconds)")
         baseSeconds -= 1     //This will decrement(count down)the seconds.
-        
     }
     @objc func updateIntervalTimer() {
         //user did get target note correct
@@ -263,14 +282,15 @@ class IntervalViewController: UIViewController {
             baseTimerDidStart = false
             intervalTimerDidStart = false
             isIntervalTest = false
-            randomNote = Int.random(in: 0..<12)
-            randomInterval = Int.random(in: 1..<12)
-            AnimationControllerTop.targetNote.text = myNotes.Notes[randomNote].name
+            generateRandoms()
+            //AnimationControllerTop.targetNote.text = myNotes.Notes[randomNote].name
+            AnimationControllerTop.animateImageOff()
+            AnimationControllerBottom.animateImageOff()
             scoreCtr += 1
             scoreLabel.text = "\(scoreCtr) pts"
+        } else {
+            intervalSeconds -= 1     //This will decrement(count down)the seconds.
         }
-        print("intervalSeconds = \(intervalSeconds)")
-        intervalSeconds -= 1     //This will decrement(count down)the seconds.
     }
     func startBaseTimer() {
         baseTimer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(IntervalViewController.updateBaseTimer)), userInfo: nil, repeats: true)

@@ -37,7 +37,7 @@ class PitchViewController: UIViewController {
     var tracker: AKFrequencyTracker!
     var silence: AKBooster!
     
-    var randomNote = Int.random(in: 0..<12)
+    var randomNote = Int.random(in: 0..<23)
     
     //Screen Size
     var labelWidth = CGFloat()
@@ -100,7 +100,7 @@ class PitchViewController: UIViewController {
     
     @IBAction func nextNote(_ sender: Any) {
         randomNote = Int.random(in: 0..<12)
-        AnimationController.targetNote.text = myNotes.Notes[randomNote].name
+        AnimationController.targetNote.text = myNotes.Notes[(randomNote+8)%12].name
     }
     
     @IBAction func playAudio(_ sender: Any) {
@@ -142,7 +142,7 @@ class PitchViewController: UIViewController {
         if AnimationController != nil {
             AnimationController.height = height
             AnimationController.labelWidth = width-83
-            AnimationController.targetNote.text = myNotes.Notes[randomNote].name
+            AnimationController.targetNote.text = myNotes.Notes[(randomNote+8)%12].name
         }
         //Set measured values from ProcessTone class
         let frequency = processTone.getBaseFrequency(frequency: Float(tracker.frequency), targetArray: targetArray)
