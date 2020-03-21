@@ -1,64 +1,60 @@
 package com.example.musicalears;
 
-import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Note {
-    private String noteName;
+class Note {
+    private final String noteName;
     private float noteFrequency;
-    private int noteResource;
 
-    //constructor
-    Note(String noteName, float noteFrequency, int noteResource) {
+    Note(String noteName, float noteFrequency) {
         this.noteName = noteName;
         this.noteFrequency = noteFrequency;
-        this.noteResource = noteResource;
     }
 
     final static List<Note> noteList = new ArrayList<Note>() {{
-        add(new Note("C", (float) 16.35, R.raw.c4));
-        add(new Note("C♯", (float) 17.32, R.raw.csh4));
-        add(new Note("D", (float) 18.35, R.raw.d4));
-        add(new Note("D♯", (float) 19.45, R.raw.dsh4));
-        add(new Note("E", (float) 20.6, R.raw.e4));
-        add(new Note("F", (float) 21.83, R.raw.f4));
-        add(new Note("F♯", (float) 23.12, R.raw.fsh4));
-        add(new Note("G", (float) 24.5, R.raw.g3));
-        add(new Note("G♯", (float) 25.96, R.raw.gsh3));
-        add(new Note("A", (float) 27.5, R.raw.a3));
-        add(new Note( "A♯", (float) 29.14, R.raw.bb3));
-        add(new Note( "B", (float) 30.87, R.raw.b3));
+        add(new Note("C", (float) 16.35));
+        add(new Note("C♯", (float) 17.32));
+        add(new Note("D", (float) 18.35));
+        add(new Note("D♯", (float) 19.45));
+        add(new Note("E", (float) 20.6));
+        add(new Note("F", (float) 21.83));
+        add(new Note("F♯", (float) 23.12));
+        add(new Note("G", (float) 24.5));
+        add(new Note("G♯", (float) 25.96));
+        add(new Note("A", (float) 27.5));
+        add(new Note( "A♯", (float) 29.14));
+        add(new Note( "B", (float) 30.87));
     }};
 
     final static List<Note> adjustedNoteList = new ArrayList<Note>() {{
-        add(new Note("C", (float) 16.35, R.raw.c4));
-        add(new Note("C♯", (float) 17.32, R.raw.csh4));
-        add(new Note("D", (float) 18.35, R.raw.d4));
-        add(new Note("D♯", (float) 19.45, R.raw.dsh4));
-        add(new Note("E", (float) 20.6, R.raw.e4));
-        add(new Note("F", (float) 21.83, R.raw.f4));
-        add(new Note("F♯", (float) 23.12, R.raw.fsh4));
-        add(new Note("G", (float) 24.5, R.raw.g3));
-        add(new Note("G♯", (float) 25.96, R.raw.gsh3));
-        add(new Note("A", (float) 27.5, R.raw.a3));
-        add(new Note( "A♯", (float) 29.14, R.raw.bb3));
-        add(new Note( "B", (float) 30.87, R.raw.b3));
+        add(new Note("C", (float) 16.35));
+        add(new Note("C♯", (float) 17.32));
+        add(new Note("D", (float) 18.35));
+        add(new Note("D♯", (float) 19.45));
+        add(new Note("E", (float) 20.6));
+        add(new Note("F", (float) 21.83));
+        add(new Note("F♯", (float) 23.12));
+        add(new Note("G", (float) 24.5));
+        add(new Note("G♯", (float) 25.96));
+        add(new Note("A", (float) 27.5));
+        add(new Note( "A♯", (float) 29.14));
+        add(new Note( "B", (float) 30.87));
     }};
 
     final static List<Note> adjustedIntervalNoteList = new ArrayList<Note>() {{
-        add(new Note("C", (float) 16.35, R.raw.c4));
-        add(new Note("C♯", (float) 17.32, R.raw.csh4));
-        add(new Note("D", (float) 18.35, R.raw.d4));
-        add(new Note("D♯", (float) 19.45, R.raw.dsh4));
-        add(new Note("E", (float) 20.6, R.raw.e4));
-        add(new Note("F", (float) 21.83, R.raw.f4));
-        add(new Note("F♯", (float) 23.12, R.raw.fsh4));
-        add(new Note("G", (float) 24.5, R.raw.g3));
-        add(new Note("G♯", (float) 25.96, R.raw.gsh3));
-        add(new Note("A", (float) 27.5, R.raw.a3));
-        add(new Note( "A♯", (float) 29.14, R.raw.bb3));
-        add(new Note( "B", (float) 30.87, R.raw.b3));
+        add(new Note("C", (float) 16.35));
+        add(new Note("C♯", (float) 17.32));
+        add(new Note("D", (float) 18.35));
+        add(new Note("D♯", (float) 19.45));
+        add(new Note("E", (float) 20.6));
+        add(new Note("F", (float) 21.83));
+        add(new Note("F♯", (float) 23.12));
+        add(new Note("G", (float) 24.5));
+        add(new Note("G♯", (float) 25.96));
+        add(new Note("A", (float) 27.5));
+        add(new Note( "A♯", (float) 29.14));
+        add(new Note( "B", (float) 30.87));
     }};
 
     String getNoteName() {
@@ -69,10 +65,6 @@ public class Note {
         return noteFrequency;
     }
 
-    int getNoteResource() {
-        return noteResource;
-    }
-
     void adjustNotes(int randomNoteIndex, boolean isInterval) {
         int indexDiff = randomNoteIndex - 5;
         if (indexDiff > 0) {
@@ -80,29 +72,23 @@ public class Note {
         } else if (indexDiff < 0) {
             shiftArrayRight(Math.abs(indexDiff), isInterval);
         }
-        if (!isInterval) {
-            Log.d("adjustedArray", adjustedNoteList.toString());
-        } else {
-            Log.d("adjustedIntervalArray", adjustedIntervalNoteList.toString());
-        }
     }
 
     private void shiftArrayRight(int indexDiff, boolean isInterval) {
-
         if (!isInterval) {
             adjustedNoteList.clear();
-            adjustedNoteList.add(new Note("C", (float) 16.35, R.raw.c4));
-            adjustedNoteList.add(new Note("C♯", (float) 17.32, R.raw.csh4));
-            adjustedNoteList.add(new Note("D", (float) 18.35, R.raw.d4));
-            adjustedNoteList.add(new Note("D♯", (float) 19.45, R.raw.dsh4));
-            adjustedNoteList.add(new Note("E", (float) 20.6, R.raw.e4));
-            adjustedNoteList.add(new Note("F", (float) 21.83, R.raw.f4));
-            adjustedNoteList.add(new Note("F♯", (float) 23.12, R.raw.fsh4));
-            adjustedNoteList.add(new Note("G", (float) 24.5, R.raw.g3));
-            adjustedNoteList.add(new Note("G♯", (float) 25.96, R.raw.gsh3));
-            adjustedNoteList.add(new Note("A", (float) 27.5, R.raw.a3));
-            adjustedNoteList.add(new Note( "A♯", (float) 29.14, R.raw.bb3));
-            adjustedNoteList.add(new Note( "B", (float) 30.87, R.raw.b3));
+            adjustedNoteList.add(new Note("C", (float) 16.35));
+            adjustedNoteList.add(new Note("C♯", (float) 17.32));
+            adjustedNoteList.add(new Note("D", (float) 18.35));
+            adjustedNoteList.add(new Note("D♯", (float) 19.45));
+            adjustedNoteList.add(new Note("E", (float) 20.6));
+            adjustedNoteList.add(new Note("F", (float) 21.83));
+            adjustedNoteList.add(new Note("F♯", (float) 23.12));
+            adjustedNoteList.add(new Note("G", (float) 24.5));
+            adjustedNoteList.add(new Note("G♯", (float) 25.96));
+            adjustedNoteList.add(new Note("A", (float) 27.5));
+            adjustedNoteList.add(new Note( "A♯", (float) 29.14));
+            adjustedNoteList.add(new Note( "B", (float) 30.87));
 
             for (int i = 0; i < indexDiff; i++) {
                 Note lastNote = adjustedNoteList.remove(adjustedNoteList.size() - 1);
@@ -111,18 +97,18 @@ public class Note {
             }
         } else {
             adjustedIntervalNoteList.clear();
-            adjustedIntervalNoteList.add(new Note("C", (float) 16.35, R.raw.c4));
-            adjustedIntervalNoteList.add(new Note("C♯", (float) 17.32, R.raw.csh4));
-            adjustedIntervalNoteList.add(new Note("D", (float) 18.35, R.raw.d4));
-            adjustedIntervalNoteList.add(new Note("D♯", (float) 19.45, R.raw.dsh4));
-            adjustedIntervalNoteList.add(new Note("E", (float) 20.6, R.raw.e4));
-            adjustedIntervalNoteList.add(new Note("F", (float) 21.83, R.raw.f4));
-            adjustedIntervalNoteList.add(new Note("F♯", (float) 23.12, R.raw.fsh4));
-            adjustedIntervalNoteList.add(new Note("G", (float) 24.5, R.raw.g3));
-            adjustedIntervalNoteList.add(new Note("G♯", (float) 25.96, R.raw.gsh3));
-            adjustedIntervalNoteList.add(new Note("A", (float) 27.5, R.raw.a3));
-            adjustedIntervalNoteList.add(new Note( "A♯", (float) 29.14, R.raw.bb3));
-            adjustedIntervalNoteList.add(new Note( "B", (float) 30.87, R.raw.b3));
+            adjustedIntervalNoteList.add(new Note("C", (float) 16.35));
+            adjustedIntervalNoteList.add(new Note("C♯", (float) 17.32));
+            adjustedIntervalNoteList.add(new Note("D", (float) 18.35));
+            adjustedIntervalNoteList.add(new Note("D♯", (float) 19.45));
+            adjustedIntervalNoteList.add(new Note("E", (float) 20.6));
+            adjustedIntervalNoteList.add(new Note("F", (float) 21.83));
+            adjustedIntervalNoteList.add(new Note("F♯", (float) 23.12));
+            adjustedIntervalNoteList.add(new Note("G", (float) 24.5));
+            adjustedIntervalNoteList.add(new Note("G♯", (float) 25.96));
+            adjustedIntervalNoteList.add(new Note("A", (float) 27.5));
+            adjustedIntervalNoteList.add(new Note( "A♯", (float) 29.14));
+            adjustedIntervalNoteList.add(new Note( "B", (float) 30.87));
 
             for (int i = 0; i < indexDiff; i++) {
                 Note lastNote = adjustedIntervalNoteList.remove(adjustedIntervalNoteList.size() - 1);
@@ -135,39 +121,38 @@ public class Note {
     private void shiftArrayLeft(int indexDiff, boolean isInterval) {
         if (!isInterval) {
             adjustedNoteList.clear();
-            adjustedNoteList.add(new Note("C", (float) 16.35, R.raw.c4));
-            adjustedNoteList.add(new Note("C♯", (float) 17.32, R.raw.csh4));
-            adjustedNoteList.add(new Note("D", (float) 18.35, R.raw.d4));
-            adjustedNoteList.add(new Note("D♯", (float) 19.45, R.raw.dsh4));
-            adjustedNoteList.add(new Note("E", (float) 20.6, R.raw.e4));
-            adjustedNoteList.add(new Note("F", (float) 21.83, R.raw.f4));
-            adjustedNoteList.add(new Note("F♯", (float) 23.12, R.raw.fsh4));
-            adjustedNoteList.add(new Note("G", (float) 24.5, R.raw.g3));
-            adjustedNoteList.add(new Note("G♯", (float) 25.96, R.raw.gsh3));
-            adjustedNoteList.add(new Note("A", (float) 27.5, R.raw.a3));
-            adjustedNoteList.add(new Note( "A♯", (float) 29.14, R.raw.bb3));
-            adjustedNoteList.add(new Note( "B", (float) 30.87, R.raw.b3));
+            adjustedNoteList.add(new Note("C", (float) 16.35));
+            adjustedNoteList.add(new Note("C♯", (float) 17.32));
+            adjustedNoteList.add(new Note("D", (float) 18.35));
+            adjustedNoteList.add(new Note("D♯", (float) 19.45));
+            adjustedNoteList.add(new Note("E", (float) 20.6));
+            adjustedNoteList.add(new Note("F", (float) 21.83));
+            adjustedNoteList.add(new Note("F♯", (float) 23.12));
+            adjustedNoteList.add(new Note("G", (float) 24.5));
+            adjustedNoteList.add(new Note("G♯", (float) 25.96));
+            adjustedNoteList.add(new Note("A", (float) 27.5));
+            adjustedNoteList.add(new Note( "A♯", (float) 29.14));
+            adjustedNoteList.add(new Note( "B", (float) 30.87));
 
             for (int i = 0; i < indexDiff; i++) {
                 Note firstNote = adjustedNoteList.remove(0);
                 firstNote.noteFrequency = firstNote.noteFrequency * 2;
                 adjustedNoteList.add(adjustedNoteList.size(), firstNote);
             }
-
         } else {
             adjustedIntervalNoteList.clear();
-            adjustedIntervalNoteList.add(new Note("C", (float) 16.35, R.raw.c4));
-            adjustedIntervalNoteList.add(new Note("C♯", (float) 17.32, R.raw.csh4));
-            adjustedIntervalNoteList.add(new Note("D", (float) 18.35, R.raw.d4));
-            adjustedIntervalNoteList.add(new Note("D♯", (float) 19.45, R.raw.dsh4));
-            adjustedIntervalNoteList.add(new Note("E", (float) 20.6, R.raw.e4));
-            adjustedIntervalNoteList.add(new Note("F", (float) 21.83, R.raw.f4));
-            adjustedIntervalNoteList.add(new Note("F♯", (float) 23.12, R.raw.fsh4));
-            adjustedIntervalNoteList.add(new Note("G", (float) 24.5, R.raw.g3));
-            adjustedIntervalNoteList.add(new Note("G♯", (float) 25.96, R.raw.gsh3));
-            adjustedIntervalNoteList.add(new Note("A", (float) 27.5, R.raw.a3));
-            adjustedIntervalNoteList.add(new Note( "A♯", (float) 29.14, R.raw.bb3));
-            adjustedIntervalNoteList.add(new Note( "B", (float) 30.87, R.raw.b3));
+            adjustedIntervalNoteList.add(new Note("C", (float) 16.35));
+            adjustedIntervalNoteList.add(new Note("C♯", (float) 17.32));
+            adjustedIntervalNoteList.add(new Note("D", (float) 18.35));
+            adjustedIntervalNoteList.add(new Note("D♯", (float) 19.45));
+            adjustedIntervalNoteList.add(new Note("E", (float) 20.6));
+            adjustedIntervalNoteList.add(new Note("F", (float) 21.83));
+            adjustedIntervalNoteList.add(new Note("F♯", (float) 23.12));
+            adjustedIntervalNoteList.add(new Note("G", (float) 24.5));
+            adjustedIntervalNoteList.add(new Note("G♯", (float) 25.96));
+            adjustedIntervalNoteList.add(new Note("A", (float) 27.5));
+            adjustedIntervalNoteList.add(new Note( "A♯", (float) 29.14));
+            adjustedIntervalNoteList.add(new Note( "B", (float) 30.87));
 
             for (int i = 0; i < indexDiff; i++) {
                 Note firstNote = adjustedIntervalNoteList.remove(0);
@@ -175,9 +160,5 @@ public class Note {
                 adjustedIntervalNoteList.add(adjustedIntervalNoteList.size(), firstNote);
             }
         }
-    }
-
-    public String toString() {
-        return this.noteName + " : " + this.noteFrequency;
     }
 }

@@ -1,27 +1,30 @@
 package com.example.musicalears;
 
-public class TargetNote extends Note {
-    private float targetUpperTwenty = -1;
-    private float targetLowerTwenty = -1;
+import java.util.List;
 
-    //constructor
-    public TargetNote(String noteName, float noteFrequency, int noteResource) {
-        super(noteName, noteFrequency, noteResource);
+class TargetNote extends Note {
+
+    TargetNote(String noteName, float noteFrequency) {
+        super(noteName, noteFrequency);
     }
 
-    public float getTargetLowerTwenty() {
-        return targetLowerTwenty;
+    float getUpperTwenty(boolean isInterval) {
+        List<Note> list;
+        if (isInterval) {
+            list = adjustedIntervalNoteList;
+        } else {
+            list = adjustedNoteList;
+        }
+        return list.get(5).getNoteFrequency() + (list.get(6).getNoteFrequency() - list.get(5).getNoteFrequency())/2;
     }
 
-    public float getTargetUpperTwenty() {
-        return targetUpperTwenty;
-    }
-
-    public void setTargetLowerTwenty(float targetLowerTwenty) {
-        this.targetLowerTwenty = targetLowerTwenty;
-    }
-
-    public void setTargetUpperTwenty(float targetUpperTwenty) {
-        this.targetUpperTwenty = targetUpperTwenty;
+    float getLowerTwenty(boolean isInterval) {
+        List<Note> list;
+        if (isInterval) {
+            list = adjustedIntervalNoteList;
+        } else {
+            list = adjustedNoteList;
+        }
+        return list.get(5).getNoteFrequency() + (list.get(4).getNoteFrequency() - list.get(5).getNoteFrequency())/2;
     }
 }

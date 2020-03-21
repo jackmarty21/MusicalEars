@@ -10,14 +10,16 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
@@ -30,104 +32,113 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 import static com.example.musicalears.Note.noteList;
 
 public class IntervalTrainingActivity extends AppCompatActivity {
-
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
-    private static PitchDetectionHandler pitchDetectionHandler;
-    private static MediaPlayer mp;
+    private final Handler timerHandler = new Handler();
 
     private TextView scoreText;
-    private TextView statusText;
-    private View disableFilter;
-    private ImageButton playButton;
-    private Spinner intervalSpinner;
+    private TextView timerText;
+    private TextView intervalText;
+    private ImageView micView;
+    private ImageView skipView;
 
-    PitchMatchFragment intervalPitchMatchFragment;
-    PitchMatchFragment basePitchMatchFragment;
-    private TargetNote randomNote;
-    private TargetNote intervalNote;
+    private TargetNote targetNote = null;
+    private TargetNote intervalNote = null;
 
-    private boolean shouldBaseListen;
-    private boolean shouldIntervalListen;
-    private boolean didGetBaseNote = false;
-
-    private int numSemitones;
     private int randomNoteIndex;
     private int intervalNoteIndex;
+
+    private PitchMatchFragment intervalPitchMatchFragment;
+    private PitchMatchFragment basePitchMatchFragment;
+
+    private boolean didGetBaseNote = false;
+
+    private int score = 0;
+    private long startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_interval_training);
 
-        scoreText = findViewById(R.id.scoreText);
-        disableFilter = findViewById(R.id.disableFilter);
-        statusText = findViewById(R.id.statusText);
-        playButton = findViewById(R.id.playButton);
-        intervalSpinner = findViewById(R.id.spinner);
-
-        intervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                numSemitones = (int) (adapterView.getItemIdAtPosition(i) + 1);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        intervalPitchMatchFragment = PitchMatchFragment.newInstance("interval", "true");
         basePitchMatchFragment = PitchMatchFragment.newInstance("interval", "false");
-        getSupportFragmentManager().beginTransaction().replace(R.id.intervalPitchMatchFrameLayout, intervalPitchMatchFragment).commit();
         getSupportFragmentManager().beginTransaction().replace(R.id.basePitchMatchFrameLayout, basePitchMatchFragment).commit();
-        
-        checkPermissions();
-    }
+        intervalPitchMatchFragment = PitchMatchFragment.newInstance("interval", "true");
+        getSupportFragmentManager().beginTransaction().replace(R.id.intervalPitchMatchFrameLayout, intervalPitchMatchFragment).commit();
 
-    private void startApp() {
-        shouldBaseListen = true;
-        shouldIntervalListen = false;
-        statusText.setText(R.string.mic_on);
+        scoreText = findViewById(R.id.scoreText);
+        timerText = findViewById(R.id.timerText);
+        intervalText = findViewById(R.id.intervalText);
 
+        ImageButton playButton = findViewById(R.id.playButton2);
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 playRandomTone();
-                basePitchMatchFragment.onPlayRandomTone(randomNote, false);
-                intervalPitchMatchFragment.onPlayRandomTone(intervalNote, true);
             }
         });
-        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
-        pitchDetectionHandler = new PitchDetectionHandler() {
+
+        micView = findViewById(R.id.micView);
+        micView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void handlePitch(PitchDetectionResult pitchDetectionResult, AudioEvent audioEvent) {
+            public void onClick(View view) {
+                if (basePitchMatchFragment.getShouldListen() ||
+                        intervalPitchMatchFragment.getShouldListen()) {
+                    basePitchMatchFragment.setShouldListen(false);
+                    intervalPitchMatchFragment.setShouldListen(false);
+                    micView.setImageResource(R.drawable.mic_off);
+                    micView.setAlpha(0.5f);
+                } else if (targetNote != null) {
+                    if (didGetBaseNote) {
+                        basePitchMatchFragment.setShouldListen(false);
+                        intervalPitchMatchFragment.setShouldListen(true);
+                    } else {
+                        basePitchMatchFragment.setShouldListen(true);
+                        intervalPitchMatchFragment.setShouldListen(false);
+                    }
+                    micView.setImageResource(R.drawable.mic_on);
+                    micView.setAlpha(1f);
+                }
+            }
+        });
+        skipView = findViewById(R.id.skipView);
+        skipView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (targetNote != null) {
+                    targetNote = null;
+                    intervalNote = null;
+                    micView.setAlpha(.5f);
+                    playRandomTone();
+                }
+            }
+        });
+
+        checkPermissionsAndStart();
+    }
+
+    private void startApp() {
+        startTimer(new Date().getTime());
+
+        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
+        PitchDetectionHandler pitchDetectionHandler = new PitchDetectionHandler() {
+            @Override
+            public void handlePitch(final PitchDetectionResult pitchDetectionResult, AudioEvent audioEvent) {
                 final float pitchInHz = pitchDetectionResult.getPitch();
                 final float probability = pitchDetectionResult.getProbability();
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (shouldBaseListen) {
-                            float frequency = basePitchMatchFragment.processPitch(pitchInHz, probability, didGetBaseNote);
-
-                            if (basePitchMatchFragment.targetNote != null) {
-                                if (frequency > 0 && basePitchMatchFragment.checkAccuracy(frequency)) {
-                                    basePitchMatchFragment.startTimer(1000, false);
-                                } else {
-                                    basePitchMatchFragment.stopTimer();
-                                }
+                        if (basePitchMatchFragment.getShouldListen() &&
+                                targetNote != null) {
+                            if (pitchInHz > 0 && probability > .9) {
+                                basePitchMatchFragment.processPitch(pitchInHz, false);
                             } else {
                                 basePitchMatchFragment.stopTimer();
                             }
-                        } else if (shouldIntervalListen) {
-                            float frequency = intervalPitchMatchFragment.processPitch(pitchInHz, probability, didGetBaseNote);
-
-                            if (intervalPitchMatchFragment.targetNote != null) {
-                                if (frequency > 0 && intervalPitchMatchFragment.checkAccuracy(frequency)) {
-                                    intervalPitchMatchFragment.startTimer(2000, true);
-                                } else {
-                                    intervalPitchMatchFragment.stopTimer();
-                                }
+                        } else if (intervalPitchMatchFragment.getShouldListen() && intervalNote != null){
+                            if (pitchInHz > 0 && probability > .9) {
+                                intervalPitchMatchFragment.processPitch(pitchInHz, true);
                             } else {
                                 intervalPitchMatchFragment.stopTimer();
                             }
@@ -144,114 +155,110 @@ public class IntervalTrainingActivity extends AppCompatActivity {
         audioThread.start();
     }
 
-    private void playRandomTone() {
-        if (didGetBaseNote) {
-            switchFragments();
-        }
+    private void startTimer(long time) {
+        startTime = time;
+        timerHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateTimer();
+                timerHandler.postDelayed(this, 1000);
+            }
+        }, 0);
+    }
 
-        shouldBaseListen = false;
-        shouldIntervalListen = false;
-        statusText.setText("");
-        if (randomNote != null) {
-            randomNoteIndex = 5;
-            intervalNoteIndex = randomNoteIndex + numSemitones;
-            if (intervalNoteIndex > 11) {
-                intervalNoteIndex-=12;
+    private void setTargetNote() {
+        if (targetNote == null) {
+            int randomInterval = (int) Math.floor(Math.random() * 11) + 1;
+            boolean isIntervalAbove = Math.random() < 0.5;
+
+            if (isIntervalAbove) {
+                randomNoteIndex = (int) Math.floor(Math.random() * (22 - randomInterval));
+                intervalNoteIndex = randomNoteIndex + randomInterval;
+            } else {
+                randomNoteIndex = (int) Math.floor(Math.random() * (22 - randomInterval)) + randomInterval;
+                intervalNoteIndex = randomNoteIndex - randomInterval;
             }
-        } else {
-            randomNoteIndex = (int) Math.floor(Math.random()*12);
-//            randomNoteIndex = 0;
-            intervalNoteIndex = randomNoteIndex + numSemitones;
-            if (intervalNoteIndex > 11) {
-                intervalNoteIndex-=12;
-            }
-            randomNote = new TargetNote(
-                    noteList.get(randomNoteIndex).getNoteName(),
-                    noteList.get(randomNoteIndex).getNoteFrequency(),
-                    noteList.get(randomNoteIndex).getNoteResource());
+
+            int adjustedRandomIndex = (randomNoteIndex + 8)%12;
+            int adjustedIntervalIndex = (intervalNoteIndex + 8)%12;
+
+            targetNote = new TargetNote(
+                    noteList.get(adjustedRandomIndex).getNoteName(),
+                    noteList.get(adjustedRandomIndex).getNoteFrequency());
+            targetNote.adjustNotes(adjustedRandomIndex, false);
+            basePitchMatchFragment.setTargetNote(targetNote);
+
             intervalNote = new TargetNote(
-                    noteList.get(intervalNoteIndex).getNoteName(),
-                    noteList.get(intervalNoteIndex).getNoteFrequency(),
-                    noteList.get(intervalNoteIndex).getNoteResource());
+                    noteList.get(adjustedIntervalIndex).getNoteName(),
+                    noteList.get(adjustedIntervalIndex).getNoteFrequency());
+            intervalNote.adjustNotes(adjustedIntervalIndex, true);
+            intervalPitchMatchFragment.setTargetNote(intervalNote);
 
-            randomNote.adjustNotes(randomNoteIndex, false);
-            randomNote.adjustNotes(randomNoteIndex, false);
-            intervalNote.adjustNotes(intervalNoteIndex, true);
+            intervalText.setText(getIntervalName(randomInterval, isIntervalAbove));
+            skipView.setAlpha(1f);
         }
+    }
 
-        Log.d("randomNoteName", String.valueOf(randomNote.getNoteName()));
-        Log.d("randomNoteFreq", String.valueOf(randomNote.getNoteFrequency()));
-        Log.d("intervalNoteName", String.valueOf(intervalNote.getNoteName()));
-        Log.d("intervalNoteFreq", String.valueOf(intervalNote.getNoteFrequency()));
+    private void playRandomTone() {
+        basePitchMatchFragment.setShouldListen(false);
+        intervalPitchMatchFragment.setShouldListen(false);
+        micView.setImageResource(R.drawable.mic_off);
+        micView.setAlpha(.5f);
+        setTargetNote();
 
-        mp = MediaPlayer.create(IntervalTrainingActivity.this, randomNote.getNoteResource());
+        final int intervalNoteResource = getResources().getIdentifier("note" + intervalNoteIndex, "raw", getPackageName());
+        final int baseNoteResource = getResources().getIdentifier("note" + randomNoteIndex, "raw", getPackageName());
+
+        final MediaPlayer mp = MediaPlayer.create(IntervalTrainingActivity.this, baseNoteResource);
         mp.start();
+
         new Handler().postDelayed(
                 new Runnable() {
                     public void run() {
-                        mp = MediaPlayer.create(IntervalTrainingActivity.this, intervalNote.getNoteResource());
-                        mp.start();
+                        final MediaPlayer mp2 = MediaPlayer.create(IntervalTrainingActivity.this, intervalNoteResource);
+                        mp2.start();
                     }
                 }, 1000);
 
-
-        //prevents the app from 'listening' to itself
+//        prevents the app from 'listening' to itself
         new Handler().postDelayed(
                 new Runnable() {
                     public void run() {
-                        statusText.setText(R.string.now_listening);
                         if (didGetBaseNote) {
-                            shouldBaseListen = false;
-                            shouldIntervalListen = true;
+                            basePitchMatchFragment.setShouldListen(false);
+                            intervalPitchMatchFragment.setShouldListen(true);
                         } else {
-                            shouldBaseListen = true;
-                            shouldIntervalListen = false;
+                            basePitchMatchFragment.setShouldListen(true);
+                            intervalPitchMatchFragment.setShouldListen(false);
                         }
+                        micView.setImageResource(R.drawable.mic_on);
+                        micView.setAlpha(1f);
                     }
-                }, 2500);
+                }, 3000);
     }
 
-    public void scorePoint(int points) {
-        scoreText.setText(points + " pts");
-    }
-
-    public void reset() {
-        randomNote = null;
+    public void scorePointAndReset() {
+        targetNote = null;
         intervalNote = null;
-        switchFragments();
+        micView.setImageResource(R.drawable.mic_off);
+        micView.setAlpha(0.5f);
+        score++;
+        String text = score + " pts";
+        scoreText.setText(text);
+
+        intervalPitchMatchFragment.resetSelf(true);
+        basePitchMatchFragment.resetSelf(false);
+
     }
 
-    public void switchFragments() {
-        if (didGetBaseNote) {
-            didGetBaseNote = false;
-            shouldBaseListen = true;
-            shouldIntervalListen = false;
-
-            basePitchMatchFragment.getView().findViewById(R.id.disableFilter).setVisibility(View.GONE);
-            intervalPitchMatchFragment.getView().findViewById(R.id.disableFilter).setVisibility(View.VISIBLE);
-
-            ((TextView)intervalPitchMatchFragment.getView().findViewById(R.id.noteText)).setText("");
-            ((ImageView)intervalPitchMatchFragment.getView().findViewById(R.id.imageView)).setImageResource(R.drawable.circle_blue);
-        } else {
-            didGetBaseNote = true;
-            shouldBaseListen = false;
-            shouldIntervalListen = true;
-            basePitchMatchFragment.getView().findViewById(R.id.disableFilter).setVisibility(View.VISIBLE);
-            intervalPitchMatchFragment.getView().findViewById(R.id.disableFilter).setVisibility(View.GONE);
-        }
-    }
-
-    private void checkPermissions() {
-        if (ContextCompat.checkSelfPermission(IntervalTrainingActivity.this,
+    private void checkPermissionsAndStart() {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             //permission not granted
             ActivityCompat.requestPermissions(IntervalTrainingActivity.this, new String[] {Manifest.permission.RECORD_AUDIO},
                     PERMISSIONS_REQUEST_RECORD_AUDIO);
         } else {
             //permission granted
-            Log.d("permission", "GRANTED");
-//            isPermissionGranted = true;
-            disableFilter.setVisibility(View.GONE);
             startApp();
         }
     }
@@ -260,17 +267,55 @@ public class IntervalTrainingActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("permission", "GRANTED");
-//                isPermissionGranted = true;
-                disableFilter.setVisibility(View.GONE);
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //permission granted
                 startApp();
             } else {
-                Log.d("permission", "DENIED");
-//                isPermissionGranted = false;
-                disableFilter.setVisibility(View.VISIBLE);
+                //permission denied
+                basePitchMatchFragment.disableSelf();
+                intervalPitchMatchFragment.disableSelf();
             }
         }
     }
 
+    private void updateTimer() {
+        Date currentDate = new Date();
+        long currentTime = currentDate.getTime();
+        long elapsedTime = currentTime - startTime;
+        DateFormat dateFormatter = new SimpleDateFormat("mm:ss", Locale.US);
+        dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        timerText.setText(dateFormatter.format(elapsedTime));
+    }
+
+    public void switchFragments() {
+        if (!didGetBaseNote) {
+            didGetBaseNote = true;
+            intervalPitchMatchFragment.didGetBaseNote = true;
+            intervalPitchMatchFragment.setShouldListen(true);
+            intervalPitchMatchFragment.enableSelf();
+        } else {
+            didGetBaseNote = false;
+            basePitchMatchFragment.didGetBaseNote = false;
+            basePitchMatchFragment.setShouldListen(true);
+            basePitchMatchFragment.enableSelf();
+        }
+    }
+
+    private String getIntervalName(int index, boolean isAbove) {
+        String[] intervalArray = {
+                "Minor 2nd",
+                "Major 2nd",
+                "Minor 3rd",
+                "Major 3rd",
+                "Perfect 4th",
+                "Tritone",
+                "Perfect 5th",
+                "Minor 6th",
+                "Major 6th",
+                "Minor 7th",
+                "Major 7th"};
+        if (isAbove) return intervalArray[index - 1] + " Above";
+        else return intervalArray[index - 1] + " Below";
+    }
 }
