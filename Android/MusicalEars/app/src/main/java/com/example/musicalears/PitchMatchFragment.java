@@ -1,58 +1,52 @@
 package com.example.musicalears;
 
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
+import android.animation.ValueAnimator;
 import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import be.tarsos.dsp.pitch.PitchDetectionHandler;
+import java.util.List;
+import java.util.Objects;
 
 import static com.example.musicalears.Note.adjustedIntervalNoteList;
-import static com.example.musicalears.Note.noteList;
 import static com.example.musicalears.Note.adjustedNoteList;
 
-
-
 public class PitchMatchFragment extends Fragment {
-    private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     private static final String PARAM_PARENT_ACTIVITY = "param1";
     private static final String PARAM_IS_DISABLED = "param2";
 
     private String parentActivity;
     private String isFragmentDisabled;
 
-    private static PitchDetectionHandler pitchDetectionHandler;
-
     private ImageView noteBubble;
     private TextView noteText;
+    private TextView targetNoteText;
 
-    private TextView upperMaxText;
-    private TextView lowerMaxText;
-    private View upperTwentyView;
-    private View lowerTwentyView;
+    private View targetView;
+    private View progressBar;
 
-    TargetNote targetNote = null;
-    private CountDownTimer accuracyTimer = null;
+    private TargetNote targetNote = null;
 
-    private int score = 0;
+    private ValueAnimator progressBarAnimator;
+
+    boolean didGetBaseNote;
+
+    private CountDownTimer accuracyTimer;
+    private boolean shouldListen = false;
 
     public PitchMatchFragment() {
         // Required empty public constructor
     }
 
-    public static PitchMatchFragment newInstance(String parentActivity, String isFragmentDisabled) {
-        Log.d("parent", parentActivity);
-        Log.d("disable", isFragmentDisabled);
+    static PitchMatchFragment newInstance(String parentActivity, String isFragmentDisabled) {
         PitchMatchFragment fragment = new PitchMatchFragment();
         Bundle args = new Bundle();
         args.putString(PARAM_IS_DISABLED, isFragmentDisabled);
@@ -61,284 +55,189 @@ public class PitchMatchFragment extends Fragment {
         return fragment;
     }
 
-    void onPlayRandomTone(TargetNote randomNote, boolean isInterval) {
-        targetNote = randomNote;
-        noteText.setText(targetNote.getNoteName());
-        if (!isInterval) {
-            upperMaxText.setText(adjustedNoteList.get(7).getNoteName());
-            lowerMaxText.setText(adjustedNoteList.get(3).getNoteName());
-        } else {
-            upperMaxText.setText(adjustedIntervalNoteList.get(7).getNoteName());
-            lowerMaxText.setText(adjustedIntervalNoteList.get(3).getNoteName());
-        }
-
-        addTargetBounds(isInterval);
-    }
-
-    private void addTargetBounds(boolean isInterval) {
-        float targetFrequency;
-        float nextFrequency;
-        float prevFrequency;
-        float targetUpperFrequency;
-        float targetLowerFrequency;
-        float targetUpperBias;
-        float targetLowerBias;
-
-        if (!isInterval) {
-            targetFrequency = adjustedNoteList.get(5).getNoteFrequency();
-            nextFrequency = adjustedNoteList.get(6).getNoteFrequency();
-            prevFrequency = adjustedNoteList.get(4).getNoteFrequency();
-//            find value 20 cents above
-            targetUpperFrequency = targetFrequency + (nextFrequency - targetFrequency)/2;
-            Log.d("upperTwenty", String.valueOf(targetUpperFrequency));
-            targetNote.setTargetUpperTwenty(targetUpperFrequency);
-
-//            find value 20 cents below
-            targetLowerFrequency = targetFrequency + (prevFrequency - targetFrequency)/2;
-            Log.d("lowerTwenty", String.valueOf(targetLowerFrequency));
-            targetNote.setTargetLowerTwenty(targetLowerFrequency);
-            targetUpperBias = getBias(targetUpperFrequency,
-                    adjustedNoteList.get(3).getNoteFrequency(),
-                    adjustedNoteList.get(7).getNoteFrequency());
-            Log.d("upperTwentyBias", String.valueOf(targetUpperBias));
-
-            targetLowerBias = getBias(targetLowerFrequency,
-                    adjustedNoteList.get(3).getNoteFrequency(),
-                    adjustedNoteList.get(7).getNoteFrequency());
-            Log.d("lowerTwentyBias", String.valueOf(targetLowerBias));
-        } else {
-            targetFrequency = adjustedIntervalNoteList.get(5).getNoteFrequency();
-            nextFrequency = adjustedIntervalNoteList.get(6).getNoteFrequency();
-            prevFrequency = adjustedIntervalNoteList.get(4).getNoteFrequency();
-//            find value 20 cents above
-            targetUpperFrequency = targetFrequency + (nextFrequency - targetFrequency)/2;
-            Log.d("upperTwenty", String.valueOf(targetUpperFrequency));
-            targetNote.setTargetUpperTwenty(targetUpperFrequency);
-//            find value 20 cents below
-            targetLowerFrequency = targetFrequency + (prevFrequency - targetFrequency)/2;
-            Log.d("lowerTwenty", String.valueOf(targetLowerFrequency));
-            targetNote.setTargetLowerTwenty(targetLowerFrequency);
-            targetUpperBias = getBias(targetUpperFrequency,
-                    adjustedIntervalNoteList.get(3).getNoteFrequency(),
-                    adjustedIntervalNoteList.get(7).getNoteFrequency());
-            Log.d("upperTwentyBias", String.valueOf(targetUpperBias));
-
-            targetLowerBias = getBias(targetLowerFrequency,
-                    adjustedIntervalNoteList.get(3).getNoteFrequency(),
-                    adjustedIntervalNoteList.get(7).getNoteFrequency());
-            Log.d("lowerTwentyBias", String.valueOf(targetLowerBias));
-        }
-
-        ConstraintLayout.LayoutParams upperLimitLayoutParams = (ConstraintLayout.LayoutParams) upperTwentyView.getLayoutParams();
-        ConstraintLayout.LayoutParams lowerLimitLayoutParams = (ConstraintLayout.LayoutParams) lowerTwentyView.getLayoutParams();
-        upperLimitLayoutParams.verticalBias = targetUpperBias;
-        lowerLimitLayoutParams.verticalBias = targetLowerBias;
-
-        upperTwentyView.setLayoutParams(upperLimitLayoutParams);
-        lowerTwentyView.setLayoutParams(lowerLimitLayoutParams);
-    }
-
     private float getBias(float frequency, float lowerBoundsFrequency, float upperBoundsFrequency) {
-//        Log.d("bias-freq", String.valueOf(frequency));
-//        Log.d("bias-lower", String.valueOf(lowerBoundsFrequency));
-//        Log.d("bias-higher", String.valueOf(upperBoundsFrequency));
-
-
         float bias = 1 - (frequency - lowerBoundsFrequency)/(upperBoundsFrequency - lowerBoundsFrequency);
         if (bias < 0) {
             bias = 0;
         } else if (bias > 1) {
             bias = 1;
         }
-//        Log.d("bias", String.valueOf(bias));
         return bias;
     }
 
-    boolean checkAccuracy(float frequency) {
-        return frequency < targetNote.getTargetUpperTwenty() &&
-                frequency > targetNote.getTargetLowerTwenty();
+    private boolean checkAccuracy(float frequency) {
+        return frequency < targetNote.getUpperTwenty(didGetBaseNote) &&
+                frequency > targetNote.getLowerTwenty(didGetBaseNote);
     }
 
     void stopTimer() {
         if (accuracyTimer != null) {
-            //The following transition implementation is based on an online tutorial, found at:
-            //https://riptutorial.com/android/example/21224/add-transition-or-cross-fade-between-two-images-
-            TransitionDrawable transition = new TransitionDrawable(new Drawable[] {
-                    getResources().getDrawable(R.drawable.circle_green),
-                    getResources().getDrawable(R.drawable.circle_blue)
-
-            });
-            noteBubble.setImageDrawable(transition);
-            transition.startTransition(100);
-            Log.d("timer", "stop");
-
             accuracyTimer.cancel();
             accuracyTimer = null;
+
+            if (progressBarAnimator != null) progressBarAnimator.cancel();
+            progressBarAnimator = ValueAnimator.ofFloat(progressBar.getMeasuredWidth(), 1);
+            progressBarAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    float value = (float) valueAnimator.getAnimatedValue();
+                    ConstraintLayout.LayoutParams progressBarLayoutParams = (ConstraintLayout.LayoutParams) progressBar.getLayoutParams();
+                    progressBarLayoutParams.width = (int) value;
+                    progressBar.setLayoutParams(progressBarLayoutParams);
+                }
+            });
+            progressBarAnimator.setDuration(1000);
+            progressBarAnimator.start();
         }
     }
 
-    void startTimer(long duration, final boolean scorePoint) {
+    private void startTimer(long duration, final boolean scorePoint) {
         if (accuracyTimer == null) {
             accuracyTimer = new CountDownTimer(duration, 300) {
-
                 @Override
-                public void onTick(long l) {
-                    Log.d("tick", String.valueOf(l));
-                }
+                public void onTick(long l) {}
 
                 @Override
                 public void onFinish() {
-                    Log.d("should score point", String.valueOf(scorePoint));
                     if(scorePoint) {
                         scorePointAndReset();
                     } else {
-//                        interval
                         resetAndSwitchFragments();
                     }
                 }
             }.start();
-            TransitionDrawable transition = new TransitionDrawable(new Drawable[] {
-                    getResources().getDrawable(R.drawable.circle_blue),
-                    getResources().getDrawable(R.drawable.circle_green)
+            if (progressBarAnimator != null) progressBarAnimator.cancel();
+            progressBarAnimator = ValueAnimator.ofFloat(progressBar.getMeasuredWidth(), targetView.getMeasuredWidth());
+            progressBarAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    float value = (float) valueAnimator.getAnimatedValue();
+                    ConstraintLayout.LayoutParams progressBarLayoutParams = (ConstraintLayout.LayoutParams) progressBar.getLayoutParams();
+                    progressBarLayoutParams.width = (int) value;
+                    progressBar.setLayoutParams(progressBarLayoutParams);
+                }
             });
-            noteBubble.setImageDrawable(transition);
-            transition.startTransition((int) duration);
-            Log.d("timer", "start");
+            progressBarAnimator.setDuration(duration);
+            progressBarAnimator.start();
         }
     }
 
     private void resetAndSwitchFragments() {
-        //nullify values and constraints, reset for new note
-        targetNote = null;
-        upperMaxText.setText(noteList.get(noteList.size() - 1).getNoteName());
-        lowerMaxText.setText(noteList.get(0).getNoteName());
-        ConstraintLayout.LayoutParams upperLimitLayoutParams = (ConstraintLayout.LayoutParams) upperTwentyView.getLayoutParams();
-        ConstraintLayout.LayoutParams lowerLimitLayoutParams = (ConstraintLayout.LayoutParams) lowerTwentyView.getLayoutParams();
-        upperLimitLayoutParams.verticalBias = 0;
-        lowerLimitLayoutParams.verticalBias = 1;
-        upperTwentyView.setLayoutParams(upperLimitLayoutParams);
-        lowerTwentyView.setLayoutParams(lowerLimitLayoutParams);
+        didGetBaseNote = !didGetBaseNote;
+        shouldListen = false;
+        disableSelf();
+        ((IntervalTrainingActivity) Objects.requireNonNull(getActivity())).switchFragments();
+    }
 
-        ((IntervalTrainingActivity)getActivity()).switchFragments();
+    void resetSelf(boolean isDisabled) {
+        if (isDisabled) disableSelf();
+        stopTimer();
+        targetNote = null;
+        Objects.requireNonNull(getActivity()).findViewById(R.id.skipView).setAlpha(0.5f);
+        ConstraintLayout.LayoutParams noteBubbleLayoutParams = (ConstraintLayout.LayoutParams) noteBubble.getLayoutParams();
+        noteBubbleLayoutParams.verticalBias = (float) 0.5;
+        noteBubble.setLayoutParams(noteBubbleLayoutParams);
+        noteBubble.setImageResource(R.drawable.note_bubble_off);
+        noteText.setText("");
+        targetNoteText.setText("");
     }
 
     private void scorePointAndReset() {
-        score++;
+        shouldListen = false;
         switch (parentActivity) {
             case "interval":
-                ((IntervalTrainingActivity)getActivity()).scorePoint(score);
-                ((IntervalTrainingActivity)getActivity()).reset();
+                ((IntervalTrainingActivity) Objects.requireNonNull(getActivity())).switchFragments();
+                ((IntervalTrainingActivity)getActivity()).scorePointAndReset();
                 break;
             case "pitch":
-                ((PitchMatchingActivity)getActivity()).scorePoint(score);
-                ((PitchMatchingActivity)getActivity()).reset();
+                ((PitchMatchingActivity) Objects.requireNonNull(getActivity())).scorePointAndReset();
                 break;
         }
-
-        //nullify values and constraints, reset for new note
-        targetNote = null;
-        upperMaxText.setText(noteList.get(noteList.size() - 1).getNoteName());
-        lowerMaxText.setText(noteList.get(0).getNoteName());
-        ConstraintLayout.LayoutParams upperLimitLayoutParams = (ConstraintLayout.LayoutParams) upperTwentyView.getLayoutParams();
-        ConstraintLayout.LayoutParams lowerLimitLayoutParams = (ConstraintLayout.LayoutParams) lowerTwentyView.getLayoutParams();
-        upperLimitLayoutParams.verticalBias = 0;
-        lowerLimitLayoutParams.verticalBias = 1;
-        upperTwentyView.setLayoutParams(upperLimitLayoutParams);
-        lowerTwentyView.setLayoutParams(lowerLimitLayoutParams);
     }
 
-    public float processPitch(float pitchInHz, float probability, boolean isInterval) {
-        float frequency = -1;
+    void processPitch(float pitchInHz, boolean shouldScorePoint) {
+        float frequency = pitchInHz;
 
-        //filter out background noise, smooth out UI
-        if (probability > .85) {
-            frequency = pitchInHz;
-            int octave = 0;
+        float minDistance = (float) 10000.0;
+        int index = 0;
 
-            if (targetNote != null) {
-                if (!isInterval) {
-                    while (frequency > adjustedNoteList.get(adjustedNoteList.size() - 1).getNoteFrequency()) {
-                        frequency /= 2.0;
-                        octave++;
-                        if (frequency < adjustedNoteList.get(0).getNoteFrequency()) {
-                            frequency = adjustedNoteList.get(0).getNoteFrequency();
-                        }
-                    }
-                } else {
-                    while (frequency > adjustedIntervalNoteList.get(adjustedIntervalNoteList.size() - 1).getNoteFrequency()) {
-                        frequency /= 2.0;
-                        octave++;
-                        if (frequency < adjustedIntervalNoteList.get(0).getNoteFrequency()) {
-                            frequency = adjustedIntervalNoteList.get(0).getNoteFrequency();
-                        }
-                    }
-                }
-            } else {
-                while (frequency > noteList.get(noteList.size() - 1).getNoteFrequency()) {
-                    if (frequency < 32) {
-                        frequency = noteList.get(noteList.size() - 1).getNoteFrequency();
-                    } else {
-                        frequency /= 2.0;
-                        octave++;
-                        if (frequency < noteList.get(0).getNoteFrequency()) {
-                            frequency = noteList.get(0).getNoteFrequency();
-                        }
-                    }
-                }
-            }
-
-            float minDistance = (float) 10000.0;
-            int index = 0;
-
-            for (int i=0; i<noteList.size(); i++) {
-                float distance = Math.abs(noteList.get(i).getNoteFrequency() - frequency);
-                if (distance < minDistance) {
-                    index = i;
-                    minDistance = distance;
-                }
-            }
-            moveBubble(frequency, index, isInterval);
+        List<Note> list;
+        if (!didGetBaseNote) {
+            list = adjustedNoteList;
+        } else {
+            list = adjustedIntervalNoteList;
         }
-        return frequency;
+        while (frequency > list.get(list.size() - 1).getNoteFrequency()) {
+            frequency /= 2.0;
+            if (frequency < list.get(0).getNoteFrequency()) {
+                frequency = list.get(0).getNoteFrequency();
+            }
+        }
+
+        for (int i=0; i<list.size(); i++) {
+            float distance = Math.abs(list.get(i).getNoteFrequency() - frequency);
+            if (distance < minDistance) {
+                index = i;
+                minDistance = distance;
+            }
+        }
+        moveBubble(frequency, index, list, shouldScorePoint);
     }
 
-    private void moveBubble(float frequency, int index, boolean isInterval) {
+    private void moveBubble(float frequency, int index, List<Note> list, boolean shouldScorePoint) {
         final float upperBoundsFrequency;
         final float lowerBoundsFrequency;
-        //if the app is expecting a certain tone, the scale should be +-200c
-        //otherwise, reset the scale to span the entire octave.
-        if (targetNote != null ) {
-            if (!isInterval) {
-                upperBoundsFrequency = adjustedNoteList.get(7).getNoteFrequency();
-                lowerBoundsFrequency = adjustedNoteList.get(3).getNoteFrequency();
-                noteText.setText(adjustedNoteList.get(5).getNoteName());
+        upperBoundsFrequency = list.get(7).getNoteFrequency();
+        lowerBoundsFrequency = list.get(3).getNoteFrequency();
+        if (frequency < list.get(3).getNoteFrequency()) {
+            noteText.setText(list.get(3).getNoteName());
+        } else if (frequency > list.get(7).getNoteFrequency()) {
+            noteText.setText(list.get(7).getNoteName());
+        } else {
+            noteText.setText(list.get(index).getNoteName());
+        }
+        final float bias = getBias(frequency, lowerBoundsFrequency, upperBoundsFrequency);
+        ConstraintLayout.LayoutParams noteBubbleLayoutParams = (ConstraintLayout.LayoutParams) noteBubble.getLayoutParams();
+
+        noteBubbleLayoutParams.verticalBias = bias;
+        noteBubble.setLayoutParams(noteBubbleLayoutParams);
+
+        long duration;
+        if (parentActivity.equals("interval")) {
+            if (shouldScorePoint) {
+                duration = 2000;
             } else {
-                upperBoundsFrequency = adjustedIntervalNoteList.get(7).getNoteFrequency();
-                lowerBoundsFrequency = adjustedIntervalNoteList.get(3).getNoteFrequency();
-                noteText.setText(adjustedIntervalNoteList.get(5).getNoteName());
+                duration = 1000;
             }
         } else {
-            upperBoundsFrequency = noteList.get(noteList.size() - 1).getNoteFrequency();
-            lowerBoundsFrequency = noteList.get(0).getNoteFrequency();
-            noteText.setText(noteList.get(index).getNoteName()) ;
+            duration = 3000;
         }
 
-        final float bias = getBias(frequency, lowerBoundsFrequency, upperBoundsFrequency);
-        ConstraintLayout.LayoutParams imageParams = (ConstraintLayout.LayoutParams) noteBubble.getLayoutParams();
-        imageParams.verticalBias = bias;
-        noteBubble.setLayoutParams(imageParams);
+        if (checkAccuracy(frequency)) {
+            noteBubble.setImageResource(R.drawable.note_bubble_on);
+            startTimer(duration, shouldScorePoint);
+        } else {
+            noteBubble.setImageResource(R.drawable.note_bubble_off);
+            stopTimer();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (isFragmentDisabled.equals("true")) {
+            noteBubble.setAlpha(.3f);
+            targetView.setAlpha(.2f);
+            disableSelf();
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            Log.d("args", String.valueOf(getArguments()));
             parentActivity = getArguments().getString(PARAM_PARENT_ACTIVITY);
-            Log.d("parent activity", parentActivity);
             isFragmentDisabled = getArguments().getString(PARAM_IS_DISABLED);
-            Log.d("is disabled", isFragmentDisabled);
-
         }
     }
 
@@ -347,28 +246,40 @@ public class PitchMatchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_pitch_match, container, false);
-        View disableFilter = view.findViewById(R.id.disableFilter);
-        if (isFragmentDisabled.equals("true")) {
-            disableFilter.setVisibility(View.VISIBLE);
-        } else {
-            disableFilter.setVisibility(View.GONE);
-        }
-        TextView statusText = view.findViewById(R.id.statusText);
 
-        noteBubble = view.findViewById(R.id.imageView);
+        noteBubble = view.findViewById(R.id.noteBubble);
         noteText = view.findViewById(R.id.noteText);
-
-        upperMaxText = view.findViewById(R.id.octaveUpperText);
-        lowerMaxText = view.findViewById(R.id.octaveLowerText);
-        upperTwentyView = view.findViewById(R.id.targetUpperLimit);
-        lowerTwentyView = view.findViewById(R.id.targetLowerLimit);
+        targetNoteText = view.findViewById(R.id.targetNoteText);
+        targetView = view.findViewById(R.id.targetLine);
+        progressBar = view.findViewById(R.id.progressBar);
 
         return view;
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        boolean shouldListen = false;
+    void setTargetNote(TargetNote target) {
+        targetNote = target;
+        targetNoteText.setText(targetNote.getNoteName());
+    }
+
+    void setShouldListen(boolean shouldListen) {
+        this.shouldListen = shouldListen;
+    }
+
+    boolean getShouldListen() {
+        return this.shouldListen;
+    }
+
+    void disableSelf() {
+        Objects.requireNonNull(getView()).setBackgroundResource(R.drawable.layout_disabled);
+        getView().findViewById(R.id.noteBubble).setAlpha(.3f);
+        getView().findViewById(R.id.progressBar).setAlpha(.3f);
+        getView().findViewById(R.id.targetLine).setAlpha(.2f);
+    }
+
+    void enableSelf() {
+        Objects.requireNonNull(getView()).setBackgroundResource(R.drawable.layout_border);
+        getView().findViewById(R.id.noteBubble).setAlpha(1f);
+        getView().findViewById(R.id.progressBar).setAlpha(1f);
+        getView().findViewById(R.id.targetLine).setAlpha(1f);
     }
 }
