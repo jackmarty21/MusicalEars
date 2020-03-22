@@ -4,12 +4,16 @@ import android.animation.ValueAnimator;
 import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
+import androidx.transition.AutoTransition;
+import androidx.transition.TransitionManager;
 
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,9 +37,12 @@ public class PitchMatchFragment extends Fragment {
     private View targetView;
     private View progressBar;
 
+    private ConstraintLayout fragmentLayout;
+
     private TargetNote targetNote = null;
 
     private ValueAnimator progressBarAnimator;
+    private AutoTransition noteBubbleTransition;
 
     boolean didGetBaseNote;
 
@@ -129,17 +136,22 @@ public class PitchMatchFragment extends Fragment {
         ((IntervalTrainingActivity) Objects.requireNonNull(getActivity())).switchFragments();
     }
 
-    void resetSelf(boolean isDisabled) {
-        if (isDisabled) disableSelf();
-        stopTimer();
-        targetNote = null;
-        Objects.requireNonNull(getActivity()).findViewById(R.id.skipView).setAlpha(0.5f);
-        ConstraintLayout.LayoutParams noteBubbleLayoutParams = (ConstraintLayout.LayoutParams) noteBubble.getLayoutParams();
-        noteBubbleLayoutParams.verticalBias = (float) 0.5;
-        noteBubble.setLayoutParams(noteBubbleLayoutParams);
-        noteBubble.setImageResource(R.drawable.note_bubble_off);
-        noteText.setText("");
-        targetNoteText.setText("");
+    void resetSelf(final boolean isDisabled) {
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        if (isDisabled) disableSelf();
+                        stopTimer();
+                        targetNote = null;
+                        Objects.requireNonNull(getActivity()).findViewById(R.id.skipView).setAlpha(0.5f);
+                        ConstraintLayout.LayoutParams noteBubbleLayoutParams = (ConstraintLayout.LayoutParams) noteBubble.getLayoutParams();
+                        noteBubbleLayoutParams.verticalBias = (float) 0.5;
+                        noteBubble.setLayoutParams(noteBubbleLayoutParams);
+                        noteBubble.setImageResource(R.drawable.note_bubble_off);
+                        noteText.setText("");
+                        targetNoteText.setText("");                    }
+                },
+                100);
     }
 
     private void scorePointAndReset() {
@@ -155,13 +167,13 @@ public class PitchMatchFragment extends Fragment {
         }
     }
 
-    void processPitch(float pitchInHz, boolean shouldScorePoint) {
+    void processPitch(float pitchInHz, final boolean shouldScorePoint) {
         float frequency = pitchInHz;
 
         float minDistance = (float) 10000.0;
         int index = 0;
 
-        List<Note> list;
+        final List<Note> list;
         if (!didGetBaseNote) {
             list = adjustedNoteList;
         } else {
@@ -181,26 +193,14 @@ public class PitchMatchFragment extends Fragment {
                 minDistance = distance;
             }
         }
-        moveBubble(frequency, index, list, shouldScorePoint);
-    }
 
-    private void moveBubble(float frequency, int index, List<Note> list, boolean shouldScorePoint) {
-        final float upperBoundsFrequency;
-        final float lowerBoundsFrequency;
-        upperBoundsFrequency = list.get(7).getNoteFrequency();
-        lowerBoundsFrequency = list.get(3).getNoteFrequency();
-        if (frequency < list.get(3).getNoteFrequency()) {
-            noteText.setText(list.get(3).getNoteName());
-        } else if (frequency > list.get(7).getNoteFrequency()) {
-            noteText.setText(list.get(7).getNoteName());
+        final float finalFrequency = frequency;
+        final int finalIndex = index;
+        if (noteBubbleTransition != null) {
+            noteBubbleTransition = null;
         } else {
-            noteText.setText(list.get(index).getNoteName());
+            moveBubble(finalFrequency, finalIndex, list, shouldScorePoint);
         }
-        final float bias = getBias(frequency, lowerBoundsFrequency, upperBoundsFrequency);
-        ConstraintLayout.LayoutParams noteBubbleLayoutParams = (ConstraintLayout.LayoutParams) noteBubble.getLayoutParams();
-
-        noteBubbleLayoutParams.verticalBias = bias;
-        noteBubble.setLayoutParams(noteBubbleLayoutParams);
 
         long duration;
         if (parentActivity.equals("interval")) {
@@ -212,7 +212,6 @@ public class PitchMatchFragment extends Fragment {
         } else {
             duration = 3000;
         }
-
         if (checkAccuracy(frequency)) {
             noteBubble.setImageResource(R.drawable.note_bubble_on);
             startTimer(duration, shouldScorePoint);
@@ -220,6 +219,28 @@ public class PitchMatchFragment extends Fragment {
             noteBubble.setImageResource(R.drawable.note_bubble_off);
             stopTimer();
         }
+    }
+
+    private void moveBubble(float frequency, int index, List<Note> list, boolean shouldScorePoint) {
+        final float upperBoundsFrequency = list.get(7).getNoteFrequency();
+        final float lowerBoundsFrequency = list.get(3).getNoteFrequency();
+        if (frequency < list.get(0).getNoteFrequency()) {
+            noteText.setText(list.get(0).getNoteName());
+        } else if (frequency > list.get(list.size() - 1).getNoteFrequency()) {
+            noteText.setText(list.get(list.size() - 1).getNoteName());
+        } else {
+            noteText.setText(list.get(index).getNoteName());
+        }
+        final float bias = getBias(frequency, lowerBoundsFrequency, upperBoundsFrequency);
+
+        ConstraintSet noteBubbleConstraintSet = new ConstraintSet();
+        noteBubbleConstraintSet.clone(fragmentLayout);
+        noteBubbleConstraintSet.setVerticalBias(R.id.noteBubble, bias);
+        noteBubbleTransition = new AutoTransition();
+        noteBubbleTransition.setDuration(100);
+        noteBubbleTransition.setInterpolator(new AccelerateDecelerateInterpolator());
+        TransitionManager.beginDelayedTransition(fragmentLayout, noteBubbleTransition);
+        noteBubbleConstraintSet.applyTo(fragmentLayout);
     }
 
     @Override
@@ -252,6 +273,7 @@ public class PitchMatchFragment extends Fragment {
         targetNoteText = view.findViewById(R.id.targetNoteText);
         targetView = view.findViewById(R.id.targetLine);
         progressBar = view.findViewById(R.id.progressBar);
+        fragmentLayout = view.findViewById(R.id.fragment);
 
         return view;
     }

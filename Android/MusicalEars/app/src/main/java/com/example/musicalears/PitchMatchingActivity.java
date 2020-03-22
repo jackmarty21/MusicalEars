@@ -102,26 +102,26 @@ public class PitchMatchingActivity extends AppCompatActivity {
         startTimer(new Date().getTime());
 
         AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
-            PitchDetectionHandler pitchDetectionHandler = new PitchDetectionHandler() {
-                @Override
-                public void handlePitch(final PitchDetectionResult pitchDetectionResult, AudioEvent audioEvent) {
-                    final float pitchInHz = pitchDetectionResult.getPitch();
-                    final float probability = pitchDetectionResult.getProbability();
+        PitchDetectionHandler pitchDetectionHandler = new PitchDetectionHandler() {
+            @Override
+            public void handlePitch(final PitchDetectionResult pitchDetectionResult, AudioEvent audioEvent) {
+                final float pitchInHz = pitchDetectionResult.getPitch();
+                final float probability = pitchDetectionResult.getProbability();
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (pitchMatchFragment.getShouldListen() &&
-                                    targetNote != null) {
-                                if (pitchInHz > 0 && probability > .9) {
-                                    pitchMatchFragment.processPitch(pitchInHz, true);
-                                } else {
-                                    pitchMatchFragment.stopTimer();
-                                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (pitchMatchFragment.getShouldListen() &&
+                                targetNote != null) {
+                            if (probability > .8) {
+                                pitchMatchFragment.processPitch(pitchInHz, true);
+                            } else {
+                                pitchMatchFragment.stopTimer();
                             }
                         }
-                    });
-                }
+                    }
+                });
+            }
         };
 
         AudioProcessor pitchProcessor = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pitchDetectionHandler);
