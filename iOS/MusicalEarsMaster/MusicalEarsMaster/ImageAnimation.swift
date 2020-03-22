@@ -22,6 +22,7 @@ class ImageAnimation: UIViewController {
     @IBOutlet weak var imageOnConstraint: NSLayoutConstraint!
     @IBOutlet weak var noteConstraint: NSLayoutConstraint!
     @IBOutlet weak var darkLabel: UILabel!
+    @IBOutlet weak var checkMark: UIImageView!
     
         
     var myColors = Colors()
@@ -52,6 +53,8 @@ class ImageAnimation: UIViewController {
         
         targetNote.textColor = myColors.primaryDarkText
         darkLabel.backgroundColor = myColors.primaryDarkBorder
+        
+        checkMark.isHidden = true
        
     }
     override func viewDidAppear(_ animated: Bool) {
@@ -115,5 +118,19 @@ class ImageAnimation: UIViewController {
            self.view.layoutIfNeeded()
         },
         completion: nil)
+    }
+    func blankScreenOn() {
+        greenLabel.isHidden = true
+        darkLabel.isHidden = true
+        imageOn.isHidden = true
+        imageOff.isHidden = true
+        noteLabel.isHidden = true
+    }
+    func blankScreenOff() {
+        greenLabel.isHidden = false
+        darkLabel.isHidden = false
+        imageOn.isHidden = false
+        imageOff.isHidden = false
+        noteLabel.isHidden = false
     }
 }

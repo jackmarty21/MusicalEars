@@ -77,7 +77,7 @@ class IntervalViewController: UIViewController {
         baseSeconds = BASESECONDS1
         
         generateRandoms()
-        
+        AnimationControllerTop.blankScreenOn()
         do {
             try AudioKit.stop()
         } catch {
@@ -98,7 +98,7 @@ class IntervalViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
+        
         AudioKit.output = silence
         do {
             try AudioKit.start()
@@ -127,7 +127,32 @@ class IntervalViewController: UIViewController {
     }
     
     @IBAction func playAudio(_ sender: Any) {
-        playSoundFiles.playSound(fileName: String(randomNote))
+        if (micIsOn == true) {
+            micIsOn = false
+            mic.stop()
+            micButton.setImage(UIImage(named: "mic_off.jpg"), for: .normal)
+            playSoundFiles.playSound(fileName: String(randomNote))
+            sleep(1)
+            if randomUpDown == 1 {
+                playSoundFiles.playSound(fileName: String(randomNote+randomInterval))
+            } else {
+                playSoundFiles.playSound(fileName: String(randomNote-randomInterval))
+            }
+            sleep(2)
+            mic.start()
+            micButton.setImage(UIImage(named: "mic_on.jpg"), for: .normal)
+            micIsOn = true
+        }
+        else {
+            playSoundFiles.playSound(fileName: String(randomNote))
+            sleep(1)
+            if randomUpDown == 1 {
+                playSoundFiles.playSound(fileName: String(randomNote+randomInterval))
+            } else {
+                playSoundFiles.playSound(fileName: String(randomNote-randomInterval))
+            }
+            sleep(2)
+        }
     }
     
     @IBAction func nextNote(_ sender: Any) {
@@ -232,6 +257,8 @@ class IntervalViewController: UIViewController {
                 AnimationControllerBottom.noteLabel.text = "\(baseTargetArray[index].name)\(octave)"
             }
         } else {
+            AnimationControllerTop.animateImageOff()
+            AnimationControllerBottom.animateImageOff()
             baseTimer.invalidate()
             baseSeconds = BASESECONDS1
             baseTimerDidStart = false
@@ -254,11 +281,13 @@ class IntervalViewController: UIViewController {
     @objc func updateBaseTimer() {
         //user got base note correct
         if baseSeconds == 0 && isIntervalTest == false {
+            AnimationControllerTop.blankScreenOff()
             baseTimer.invalidate()
             baseSeconds = BASESECONDS2
             baseTimerDidStart = false
             isIntervalTest = true
             startBaseTimer()
+            AnimationControllerBottom.checkMark.isHidden = false
         }
         //User did not get target note, restart
         else if baseSeconds == 0 && isIntervalTest == true {
@@ -286,8 +315,10 @@ class IntervalViewController: UIViewController {
             //AnimationControllerTop.targetNote.text = myNotes.Notes[randomNote].name
             AnimationControllerTop.animateImageOff()
             AnimationControllerBottom.animateImageOff()
+            AnimationControllerTop.blankScreenOn()
             scoreCtr += 1
             scoreLabel.text = "\(scoreCtr) pts"
+            AnimationControllerBottom.checkMark.isHidden = true
         } else {
             intervalSeconds -= 1     //This will decrement(count down)the seconds.
         }
