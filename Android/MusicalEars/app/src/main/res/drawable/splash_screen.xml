@@ -7,7 +7,7 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@drawable/musical_ears_dark_150"/>
+            android:src="@drawable/musical_ears_purple_150"/>
     </item>
 
 </layer-list>
