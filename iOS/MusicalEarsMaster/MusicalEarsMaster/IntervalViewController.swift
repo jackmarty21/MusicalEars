@@ -177,7 +177,7 @@ class IntervalViewController: UIViewController {
     
     @objc func updateUI() {
         
-        let baseTargetArray = myNotes.shiftArray(randomNote: (randomNote+8) % 12)
+        let baseTargetArray = myNotes.shiftArray(randomNote: (randomNote+8)%12)
         var intervalTargetArray = [Note]()
         if randomUpDown == 1 {
             intervalTargetArray = myNotes.shiftArray(randomNote: ((randomNote+8) % 12)+randomInterval)
@@ -304,6 +304,7 @@ class IntervalViewController: UIViewController {
     @objc func updateIntervalTimer() {
         //user did get target note correct
         if intervalSeconds == 0 {
+            playSoundFiles.playSound(fileName: "sucess")
             baseTimer.invalidate()
             intervalTimer.invalidate()
             baseSeconds = BASESECONDS1

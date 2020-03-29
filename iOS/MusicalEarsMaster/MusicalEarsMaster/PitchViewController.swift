@@ -137,7 +137,7 @@ class PitchViewController: UIViewController {
     }
     
     @objc func updateUI() {
-        let targetArray = myNotes.shiftArray(randomNote: randomNote)
+        let targetArray = myNotes.shiftArray(randomNote: (randomNote+8)%12)
         
         if AnimationController != nil {
             AnimationController.height = height
@@ -181,12 +181,13 @@ class PitchViewController: UIViewController {
     
     @objc func updateTimer() {
         if seconds == 0 {
+            playSoundFiles.playSound(fileName: "sucess")
             AnimationController.animateImageOff()
             timer.invalidate()
             seconds = 3
             timerDidStart = false
             randomNote = Int.random(in: 0..<12)
-            AnimationController.targetNote.text = myNotes.Notes[randomNote].name
+            AnimationController.targetNote.text = myNotes.Notes[(randomNote+8)%12].name
             scoreCtr += 1
             scoreLabel.text = "\(scoreCtr) pts"
         }

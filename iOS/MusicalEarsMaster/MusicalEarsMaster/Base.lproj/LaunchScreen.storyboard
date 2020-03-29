@@ -15,7 +15,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="MusicalEarsLogo_Dark" translatesAutoresizingMaskIntoConstraints="NO" id="7aI-rS-VKk">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="MusicalEarsLogo_Light" translatesAutoresizingMaskIntoConstraints="NO" id="7aI-rS-VKk">
                                 <rect key="frame" x="132" y="373" width="150" height="150"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="150" id="530-gQ-GxJ"/>
@@ -23,7 +23,7 @@
                                 </constraints>
                             </imageView>
                         </subviews>
-                        <color key="backgroundColor" red="0.33804291486740112" green="0.78201085329055786" blue="0.95748871564865112" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.41960784313725491" green="0.27450980392156865" blue="0.45882352941176469" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="7aI-rS-VKk" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="2qp-u6-hiS"/>
                             <constraint firstItem="7aI-rS-VKk" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="5sG-5T-sgL"/>
@@ -37,6 +37,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="MusicalEarsLogo_Dark" width="650" height="650"/>
+        <image name="MusicalEarsLogo_Light" width="650" height="650"/>
     </resources>
 </document>

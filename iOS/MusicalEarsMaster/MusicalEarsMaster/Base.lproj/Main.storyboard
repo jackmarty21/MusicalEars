@@ -160,7 +160,7 @@
             <objects>
                 <viewController id="x4f-S1-Ghy" customClass="ImageAnimation" customModule="MusicalEarsMaster" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Am7-uH-EtI">
-                        <rect key="frame" x="0.0" y="0.0" width="382" height="621"/>
+                        <rect key="frame" x="0.0" y="0.0" width="382" height="621.5"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hE7-Y3-JZ9">
