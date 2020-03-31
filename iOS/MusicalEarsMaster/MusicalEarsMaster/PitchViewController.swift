@@ -18,12 +18,15 @@ class PitchViewController: UIViewController {
     
     let BASEAMPLITUDE = 0.03
     
+    var difficulty = Int()
+    var noteCount = Int()
+    var showTarget = Bool()
+    var seconds = Int()
+    
     var AnimationController : ImageAnimation!
-    var seconds = 3
     var timer = Timer()
     var countingTimer = Timer()
     var timerDidStart = false
-    var countingTimerStarted = false
     var scoreCtr = 0
     var countingTimerSeconds = 0
     
@@ -55,7 +58,8 @@ class PitchViewController: UIViewController {
         scoreLabel.textColor = myColors.primaryDarkText
         timerLabel.textColor = myColors.primaryDarkText
         
-                
+        startCountingTimer()
+        
         do {
             try AudioKit.stop()
         } catch {
@@ -100,14 +104,14 @@ class PitchViewController: UIViewController {
     
     @IBAction func nextNote(_ sender: Any) {
         randomNote = Int.random(in: 0..<12)
-        AnimationController.targetNote.text = myNotes.Notes[(randomNote+8)%12].name
+        if showTarget == true {
+            AnimationController.targetNote.text = myNotes.Notes[(randomNote+8)%12].name
+        } else {
+            AnimationController.targetNote.text = ""
+        }
     }
     
     @IBAction func playAudio(_ sender: Any) {
-        if countingTimerStarted == false {
-            countingTimerStarted = true
-            startCountingTimer()
-        }
         if (micIsOn == true) {
             micIsOn = false
             mic.stop()
@@ -142,7 +146,11 @@ class PitchViewController: UIViewController {
         if AnimationController != nil {
             AnimationController.height = height
             AnimationController.labelWidth = width-83
-            AnimationController.targetNote.text = myNotes.Notes[(randomNote+8)%12].name
+            if showTarget == true {
+                AnimationController.targetNote.text = myNotes.Notes[(randomNote+8)%12].name
+            } else {
+                AnimationController.targetNote.text = ""
+            }
         }
         //Set measured values from ProcessTone class
         let frequency = processTone.getBaseFrequency(frequency: Float(tracker.frequency), targetArray: targetArray)
@@ -151,7 +159,7 @@ class PitchViewController: UIViewController {
         let centAmountInt = processTone.getCents(roundedFrequency: roundedFrequency, targetArray: targetArray)
         let y = processTone.getYCoordinate(centAmountInt: centAmountInt, decrement: (Int(height)/2)-40)
         
-        AnimationController.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: 3.3)
+        AnimationController.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: difficulty + 0.3)
         
         //If micophone heads a volume above this amplitude, continue
         if tracker.amplitude > BASEAMPLITUDE {
@@ -162,7 +170,7 @@ class PitchViewController: UIViewController {
                 
             } else if abs(centAmountInt) > 50 {
                 timer.invalidate()
-                seconds = 3
+                seconds = difficulty
                 timerDidStart = false
             }
             
@@ -171,7 +179,7 @@ class PitchViewController: UIViewController {
             AnimationController.noteLabel.text = "\(targetArray[index].name)\(octave)"
         } else {
             timer.invalidate()
-            seconds = 3
+            seconds = difficulty
             timerDidStart = false
         }
         
@@ -187,9 +195,20 @@ class PitchViewController: UIViewController {
             seconds = 3
             timerDidStart = false
             randomNote = Int.random(in: 0..<12)
-            AnimationController.targetNote.text = myNotes.Notes[(randomNote+8)%12].name
+            if showTarget == true {
+                AnimationController.targetNote.text = myNotes.Notes[(randomNote+8)%12].name
+            } else {
+                AnimationController.targetNote.text = ""
+            }
             scoreCtr += 1
             scoreLabel.text = "\(scoreCtr) pts"
+        }
+        if scoreCtr == noteCount {
+            let alertController = UIAlertController(title: "Congratulations!", message:
+                "You matched \(noteCount) notes", preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "Continue", style: .default))
+
+            self.present(alertController, animated: true, completion: nil)
         }
         seconds -= 1     //This will decrement(count down)the seconds.
         
@@ -205,6 +224,9 @@ class PitchViewController: UIViewController {
     }
     func startCountingTimer() {
         countingTimer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(PitchViewController.updateCountingTimer)), userInfo: nil, repeats: true)
+    }
+    
+    func alertHandler() -> Void {
     }
 }
 

@@ -10,7 +10,6 @@
 		005840DE23F098B900232F94 /* HomeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005840DD23F098B900232F94 /* HomeController.swift */; };
 		005840E023F1D74F00232F94 /* IntervalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005840DF23F1D74F00232F94 /* IntervalViewController.swift */; };
 		005840E823F4603300232F94 /* Notes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005840E723F4603300232F94 /* Notes.swift */; };
-		005840EA23F473C800232F94 /* sounds in Resources */ = {isa = PBXBuildFile; fileRef = 005840E923F473C800232F94 /* sounds */; };
 		005840EC23F4757900232F94 /* PlaySound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005840EB23F4757900232F94 /* PlaySound.swift */; };
 		005840EE23F4799F00232F94 /* ProcessTone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005840ED23F4799F00232F94 /* ProcessTone.swift */; };
 		005B96FC24102A2600254DFE /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 005B96FB24102A2600254DFE /* Colors.swift */; };
@@ -23,13 +22,19 @@
 		0060492D23CF81D300D3C13E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0060492B23CF81D300D3C13E /* LaunchScreen.storyboard */; };
 		0060493B23CF886E00D3C13E /* AudioKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0060493923CF886E00D3C13E /* AudioKitUI.framework */; };
 		0060493C23CF886E00D3C13E /* AudioKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0060493A23CF886E00D3C13E /* AudioKit.framework */; };
+		00F838B124339B6800458A7F /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 00F838AC24339B6700458A7F /* Quicksand-Bold.ttf */; };
+		00F838B224339B6800458A7F /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 00F838AD24339B6700458A7F /* Quicksand-Regular.ttf */; };
+		00F838B324339B6800458A7F /* Quicksand-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 00F838AE24339B6700458A7F /* Quicksand-Light.ttf */; };
+		00F838B424339B6800458A7F /* Quicksand-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 00F838AF24339B6800458A7F /* Quicksand-Medium.ttf */; };
+		00F838B524339B6800458A7F /* Quicksand-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 00F838B024339B6800458A7F /* Quicksand-SemiBold.ttf */; };
+		00F838D324339F8000458A7F /* sounds in Resources */ = {isa = PBXBuildFile; fileRef = 00F838D224339F8000458A7F /* sounds */; };
+		00F838D52433A26800458A7F /* PitchSettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00F838D42433A26800458A7F /* PitchSettingsController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		005840DD23F098B900232F94 /* HomeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeController.swift; sourceTree = "<group>"; };
 		005840DF23F1D74F00232F94 /* IntervalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntervalViewController.swift; sourceTree = "<group>"; };
 		005840E723F4603300232F94 /* Notes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notes.swift; sourceTree = "<group>"; };
-		005840E923F473C800232F94 /* sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sounds; sourceTree = "<group>"; };
 		005840EB23F4757900232F94 /* PlaySound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaySound.swift; sourceTree = "<group>"; };
 		005840ED23F4799F00232F94 /* ProcessTone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessTone.swift; sourceTree = "<group>"; };
 		005B96FB24102A2600254DFE /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
@@ -46,6 +51,13 @@
 		0060493623CF83E200D3C13E /* AudioKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioKitUI.framework; path = ../Prototypes/MusicalEars/MusicalEars/AudioKitUI.framework; sourceTree = "<group>"; };
 		0060493923CF886E00D3C13E /* AudioKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioKitUI.framework; path = MusicalEarsMaster/AudioKitUI.framework; sourceTree = "<group>"; };
 		0060493A23CF886E00D3C13E /* AudioKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioKit.framework; path = MusicalEarsMaster/AudioKit.framework; sourceTree = "<group>"; };
+		00F838AC24339B6700458A7F /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
+		00F838AD24339B6700458A7F /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
+		00F838AE24339B6700458A7F /* Quicksand-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Light.ttf"; sourceTree = "<group>"; };
+		00F838AF24339B6800458A7F /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
+		00F838B024339B6800458A7F /* Quicksand-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-SemiBold.ttf"; sourceTree = "<group>"; };
+		00F838D224339F8000458A7F /* sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sounds; sourceTree = "<group>"; };
+		00F838D42433A26800458A7F /* PitchSettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PitchSettingsController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +96,7 @@
 				0060492023CF81D200D3C13E /* AppDelegate.swift */,
 				0060492223CF81D200D3C13E /* SceneDelegate.swift */,
 				005840DD23F098B900232F94 /* HomeController.swift */,
+				00F838D42433A26800458A7F /* PitchSettingsController.swift */,
 				0060492423CF81D200D3C13E /* PitchViewController.swift */,
 				005840DF23F1D74F00232F94 /* IntervalViewController.swift */,
 				005B970324108C7800254DFE /* ImageAnimation.swift */,
@@ -95,7 +108,8 @@
 				0060492E23CF81D300D3C13E /* Info.plist */,
 				0060492923CF81D300D3C13E /* Assets.xcassets */,
 				0060492B23CF81D300D3C13E /* LaunchScreen.storyboard */,
-				005840E923F473C800232F94 /* sounds */,
+				00F838D224339F8000458A7F /* sounds */,
+				00F838B624339B7200458A7F /* Fonts */,
 			);
 			path = MusicalEarsMaster;
 			sourceTree = "<group>";
@@ -109,6 +123,18 @@
 				0060493623CF83E200D3C13E /* AudioKitUI.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		00F838B624339B7200458A7F /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				00F838AC24339B6700458A7F /* Quicksand-Bold.ttf */,
+				00F838AE24339B6700458A7F /* Quicksand-Light.ttf */,
+				00F838AF24339B6800458A7F /* Quicksand-Medium.ttf */,
+				00F838AD24339B6700458A7F /* Quicksand-Regular.ttf */,
+				00F838B024339B6800458A7F /* Quicksand-SemiBold.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -169,10 +195,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00F838D324339F8000458A7F /* sounds in Resources */,
+				00F838B524339B6800458A7F /* Quicksand-SemiBold.ttf in Resources */,
 				0060492D23CF81D300D3C13E /* LaunchScreen.storyboard in Resources */,
+				00F838B424339B6800458A7F /* Quicksand-Medium.ttf in Resources */,
+				00F838B224339B6800458A7F /* Quicksand-Regular.ttf in Resources */,
 				0060492A23CF81D300D3C13E /* Assets.xcassets in Resources */,
-				005840EA23F473C800232F94 /* sounds in Resources */,
+				00F838B324339B6800458A7F /* Quicksand-Light.ttf in Resources */,
 				0060492823CF81D200D3C13E /* Main.storyboard in Resources */,
+				00F838B124339B6800458A7F /* Quicksand-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -189,6 +220,7 @@
 				005840EE23F4799F00232F94 /* ProcessTone.swift in Sources */,
 				005B970424108C7800254DFE /* ImageAnimation.swift in Sources */,
 				005840DE23F098B900232F94 /* HomeController.swift in Sources */,
+				00F838D52433A26800458A7F /* PitchSettingsController.swift in Sources */,
 				0060492123CF81D200D3C13E /* AppDelegate.swift in Sources */,
 				005840E023F1D74F00232F94 /* IntervalViewController.swift in Sources */,
 				0060492323CF81D200D3C13E /* SceneDelegate.swift in Sources */,

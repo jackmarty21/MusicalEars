@@ -20,10 +20,13 @@ class IntervalViewController: UIViewController {
     @IBOutlet weak var animationViewTop: UIView!
     @IBOutlet weak var animationViewBottom: UIView!
     
-    let BASEAMPLITUDE = 0.01
-    let INTERVALSECONDS = 2
-    let BASESECONDS1 = 1
-    let BASESECONDS2 = 11
+    let BASEAMPLITUDE = 0.03
+    let BASESECONDS2 = 20
+    
+    var difficulty = Int()
+    var noteCount = Int()
+    var showTarget = Bool()
+    var showInterval = Bool()
     
     var AnimationControllerTop : ImageAnimation!
     var AnimationControllerBottom : ImageAnimation!
@@ -35,6 +38,9 @@ class IntervalViewController: UIViewController {
     var scoreCtr = 0
     var isIntervalTest = false
     var micIsOn = false
+    
+    var countingTimer = Timer()
+    var countingTimerSeconds = 0
     
     var myNotes = Notes()
     var playSoundFiles = PlaySound()
@@ -73,11 +79,14 @@ class IntervalViewController: UIViewController {
         timerLabel.textColor = myColors.primaryDarkText
         intervalLabel.textColor = myColors.primaryDarkText
         
-        intervalSeconds = INTERVALSECONDS
-        baseSeconds = BASESECONDS1
+        intervalSeconds = difficulty
+        baseSeconds = difficulty
         
         generateRandoms()
         AnimationControllerTop.blankScreenOn()
+        
+        startCountingTimer()
+        
         do {
             try AudioKit.stop()
         } catch {
@@ -158,8 +167,19 @@ class IntervalViewController: UIViewController {
     @IBAction func nextNote(_ sender: Any) {
         generateRandoms()
         
-        AnimationControllerTop.targetNote.text = myNotes.Notes[(randomInterval+8) % 12].name
-        AnimationControllerBottom.targetNote.text = myNotes.Notes[(randomNote+8) % 12].name
+        //Show Top Controller
+        if showInterval == true {
+            AnimationControllerTop.targetNote.text = myNotes.Notes[(randomInterval+8)%12].name
+        } else {
+            AnimationControllerTop.targetNote.text = ""
+        }
+        //Show Bottom Controller
+        if showTarget == true {
+            AnimationControllerBottom.targetNote.text = myNotes.Notes[(randomNote+8)%12].name
+        } else {
+            AnimationControllerBottom.targetNote.text = ""
+        }
+
     }
 
     @IBAction func micButtonPressed(_ sender: Any) {
@@ -192,12 +212,20 @@ class IntervalViewController: UIViewController {
         if AnimationControllerTop != nil {
             AnimationControllerTop.height = heightTop
             AnimationControllerTop.labelWidth = widthTop-83
-            AnimationControllerTop.targetNote.text = intervalTargetArray[5].name
+            if showInterval == true {
+                AnimationControllerTop.targetNote.text = myNotes.Notes[(randomInterval+8)%12].name
+            } else {
+                AnimationControllerTop.targetNote.text = ""
+            }
         }
         if AnimationControllerBottom != nil {
             AnimationControllerBottom.height = heightBottom
             AnimationControllerBottom.labelWidth = widthBottom-83
-            AnimationControllerBottom.targetNote.text = myNotes.Notes[(randomNote+8) % 12].name
+            if showTarget == true {
+                AnimationControllerBottom.targetNote.text = myNotes.Notes[(randomNote+8)%12].name
+            } else {
+                AnimationControllerBottom.targetNote.text = ""
+            }
         }
         
         //If micophone heads a volume above this amplitude, continue
@@ -217,7 +245,7 @@ class IntervalViewController: UIViewController {
                 centAmountInt = processTone.getCents(roundedFrequency: roundedFrequency, targetArray: intervalTargetArray)
                 y = processTone.getYCoordinate(centAmountInt: centAmountInt, decrement: Int(heightTop/2-40))
                 
-                AnimationControllerTop.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: 2.3)
+                AnimationControllerTop.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: difficulty+0.3)
                 
                 //Start or Stop timer based off of cent value
                 if abs(centAmountInt) <= 50 && intervalTimerDidStart == false {
@@ -240,7 +268,7 @@ class IntervalViewController: UIViewController {
                 centAmountInt = processTone.getCents(roundedFrequency: roundedFrequency, targetArray: baseTargetArray)
                 y = processTone.getYCoordinate(centAmountInt: centAmountInt, decrement: Int(heightBottom/2-40))
                 
-                AnimationControllerBottom.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: 1.3)
+                AnimationControllerBottom.animateImage(y: y, centAmountInt: centAmountInt, amplitude: tracker.amplitude, baseAmplitude: BASEAMPLITUDE, duration: difficulty + 0.3)
                 
                 //Start or Stop timer based off of cent value
                 if abs(centAmountInt) <= 50 && baseTimerDidStart == false {
@@ -249,7 +277,7 @@ class IntervalViewController: UIViewController {
                     
                 } else if abs(centAmountInt) > 50 {
                     baseTimer.invalidate()
-                    baseSeconds = BASESECONDS1
+                    baseSeconds = difficulty
                     baseTimerDidStart = false
                 }
                 //Find octave of measured note
@@ -260,7 +288,7 @@ class IntervalViewController: UIViewController {
             AnimationControllerTop.animateImageOff()
             AnimationControllerBottom.animateImageOff()
             baseTimer.invalidate()
-            baseSeconds = BASESECONDS1
+            baseSeconds = difficulty
             baseTimerDidStart = false
         }
         
@@ -293,8 +321,8 @@ class IntervalViewController: UIViewController {
         else if baseSeconds == 0 && isIntervalTest == true {
             baseTimer.invalidate()
             intervalTimer.invalidate()
-            baseSeconds = BASESECONDS1
-            intervalSeconds = INTERVALSECONDS
+            baseSeconds = difficulty
+            intervalSeconds = difficulty
             baseTimerDidStart = false
             intervalTimerDidStart = false
             isIntervalTest = false
@@ -307,20 +335,27 @@ class IntervalViewController: UIViewController {
             playSoundFiles.playSound(fileName: "sucess")
             baseTimer.invalidate()
             intervalTimer.invalidate()
-            baseSeconds = BASESECONDS1
-            intervalSeconds = INTERVALSECONDS
+            baseSeconds = difficulty
+            intervalSeconds = difficulty
             baseTimerDidStart = false
             intervalTimerDidStart = false
             isIntervalTest = false
             generateRandoms()
-            //AnimationControllerTop.targetNote.text = myNotes.Notes[randomNote].name
             AnimationControllerTop.animateImageOff()
             AnimationControllerBottom.animateImageOff()
             AnimationControllerTop.blankScreenOn()
             scoreCtr += 1
             scoreLabel.text = "\(scoreCtr) pts"
             AnimationControllerBottom.checkMark.isHidden = true
-        } else {
+        }
+        if scoreCtr == noteCount {
+            let alertController = UIAlertController(title: "Congratulations!", message:
+                "You matched \(noteCount) notes", preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "Continue", style: .default))
+
+            self.present(alertController, animated: true, completion: nil)
+        }
+        else {
             intervalSeconds -= 1     //This will decrement(count down)the seconds.
         }
     }
@@ -329,6 +364,15 @@ class IntervalViewController: UIViewController {
     }
     func startIntervalTimer() {
         intervalTimer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(IntervalViewController.updateIntervalTimer)), userInfo: nil, repeats: true)
+    }
+    @objc func updateCountingTimer() {
+        countingTimerSeconds += 1
+        let minutes = Int(countingTimerSeconds) / 60 % 60
+        let seconds = Int(countingTimerSeconds) % 60
+        timerLabel.text = String(format:"%02i:%02i", minutes, seconds)
+    }
+    func startCountingTimer() {
+        countingTimer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(PitchViewController.updateCountingTimer)), userInfo: nil, repeats: true)
     }
 }
 

@@ -18,6 +18,7 @@ class PlaySound {
     func playSound(fileName : String) {
 
         let sound = Bundle.main.url(forResource: fileName, withExtension: "wav", subdirectory: "sounds")
+
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: sound!)
         }
