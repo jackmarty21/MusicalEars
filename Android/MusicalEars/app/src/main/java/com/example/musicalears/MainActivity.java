@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         pitchMatchingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, PitchMatchingActivity.class));
+                startActivity(new Intent(MainActivity.this, PitchSettingsActivity.class));
             }
         });
 
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         intervalTrainingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, IntervalTrainingActivity.class));
+                startActivity(new Intent(MainActivity.this, IntervalSettingsActivity.class));
             }
         });
     }

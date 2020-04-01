@@ -23,7 +23,7 @@
         android:id="@+id/progressBar"
         android:layout_width="1dp"
         android:layout_height="10dp"
-        android:background="@color/colorAccent"
+        android:background="@color/colorAccentGreen"
         app:layout_constraintBottom_toBottomOf="@+id/targetLine"
         app:layout_constraintEnd_toEndOf="@+id/targetLine"
         app:layout_constraintHorizontal_bias="0.0"

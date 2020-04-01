@@ -1,15 +1,19 @@
 package com.example.musicalears;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -19,6 +23,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import be.tarsos.dsp.AudioDispatcher;
@@ -32,6 +37,10 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 import static com.example.musicalears.Note.noteList;
 
 public class PitchMatchingActivity extends AppCompatActivity {
+    private static final String PARAM_NUM_NOTES = "numNotes";
+    private static final String PARAM_DURATION = "duration";
+    private static final String PARAM_SHOULD_SHOW_NOTE_NAME = "showName";
+
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     private final Handler timerHandler = new Handler();
 
@@ -49,12 +58,18 @@ public class PitchMatchingActivity extends AppCompatActivity {
     private int score = 0;
     private long startTime;
 
+    private int numNotes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pitch_matching);
 
-        pitchMatchFragment = PitchMatchFragment.newInstance("pitch", "false");
+        numNotes = Objects.requireNonNull(getIntent().getExtras()).getInt(PARAM_NUM_NOTES);
+        long paramDuration = getIntent().getExtras().getLong(PARAM_DURATION);
+        boolean paramShouldShowNoteName = getIntent().getExtras().getBoolean(PARAM_SHOULD_SHOW_NOTE_NAME);
+
+        pitchMatchFragment = PitchMatchFragment.newInstance(paramDuration, paramShouldShowNoteName, false, "pitch");
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentFrameLayout, pitchMatchFragment).commit();
 
         scoreText = findViewById(R.id.scoreText);
@@ -181,6 +196,8 @@ public class PitchMatchingActivity extends AppCompatActivity {
     }
 
     public void scorePointAndReset() {
+        final MediaPlayer mp = MediaPlayer.create(PitchMatchingActivity.this, R.raw.success);
+        mp.start();
         targetNote = null;
         micView.setImageResource(R.drawable.mic_off);
         micView.setAlpha(0.5f);
@@ -189,6 +206,19 @@ public class PitchMatchingActivity extends AppCompatActivity {
         scoreText.setText(text);
 
         pitchMatchFragment.resetSelf(false);
+
+        if (score == numNotes) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Congrats! You scored " + numNotes + " points in " + timerText.getText() + "!")
+                    .setMessage("You will now be taken back to the main screen.")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            startActivity(new Intent(PitchMatchingActivity.this, MainActivity.class));
+                        }
+                    })
+                    .show();
+        }
     }
 
     private void checkPermissionsAndStart() {
@@ -224,5 +254,11 @@ public class PitchMatchingActivity extends AppCompatActivity {
         DateFormat dateFormatter = new SimpleDateFormat("mm:ss", Locale.US);
         dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         timerText.setText(dateFormatter.format(elapsedTime));
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(PitchMatchingActivity.this, MainActivity.class));
     }
 }

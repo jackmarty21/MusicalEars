@@ -1,11 +1,14 @@
 package com.example.musicalears;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -19,6 +22,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import be.tarsos.dsp.AudioDispatcher;
@@ -32,6 +36,11 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 import static com.example.musicalears.Note.noteList;
 
 public class IntervalTrainingActivity extends AppCompatActivity {
+    private static final String PARAM_NUM_INTERVALS = "numIntervals";
+    private static final String PARAM_DURATION = "duration";
+    private static final String PARAM_SHOULD_SHOW_BASE_NOTE = "showBaseNote";
+    private static final String PARAM_SHOULD_SHOW_INTERVAL_NOTE = "showIntervalNote";
+
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
     private final Handler timerHandler = new Handler();
 
@@ -55,14 +64,21 @@ public class IntervalTrainingActivity extends AppCompatActivity {
     private int score = 0;
     private long startTime;
 
+    private int numIntervals;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_interval_training);
 
-        basePitchMatchFragment = PitchMatchFragment.newInstance("interval", "false");
+        numIntervals = Objects.requireNonNull(getIntent().getExtras()).getInt(PARAM_NUM_INTERVALS);
+        long paramDuration = getIntent().getExtras().getLong(PARAM_DURATION);
+        boolean paramShouldShowBaseNote = getIntent().getExtras().getBoolean(PARAM_SHOULD_SHOW_BASE_NOTE);
+        boolean paramShouldShowIntervalNote = getIntent().getExtras().getBoolean(PARAM_SHOULD_SHOW_INTERVAL_NOTE);
+
+        basePitchMatchFragment = PitchMatchFragment.newInstance(paramDuration, paramShouldShowBaseNote, false, "interval");
         getSupportFragmentManager().beginTransaction().replace(R.id.basePitchMatchFrameLayout, basePitchMatchFragment).commit();
-        intervalPitchMatchFragment = PitchMatchFragment.newInstance("interval", "true");
+        intervalPitchMatchFragment = PitchMatchFragment.newInstance(paramDuration, paramShouldShowIntervalNote, true, "interval");
         getSupportFragmentManager().beginTransaction().replace(R.id.intervalPitchMatchFrameLayout, intervalPitchMatchFragment).commit();
 
         scoreText = findViewById(R.id.scoreText);
@@ -238,6 +254,8 @@ public class IntervalTrainingActivity extends AppCompatActivity {
     }
 
     public void scorePointAndReset() {
+        final MediaPlayer mp = MediaPlayer.create(IntervalTrainingActivity.this, R.raw.success);
+        mp.start();
         targetNote = null;
         intervalNote = null;
         micView.setImageResource(R.drawable.mic_off);
@@ -248,6 +266,19 @@ public class IntervalTrainingActivity extends AppCompatActivity {
 
         intervalPitchMatchFragment.resetSelf(true);
         basePitchMatchFragment.resetSelf(false);
+
+        if (score == numIntervals) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Congrats! You scored " + numIntervals + " points in " + timerText.getText() + "!")
+                    .setMessage("You will now be taken back to the main screen.")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            startActivity(new Intent(IntervalTrainingActivity.this, MainActivity.class));
+                        }
+                    })
+                    .show();
+        }
 
     }
 
@@ -317,5 +348,11 @@ public class IntervalTrainingActivity extends AppCompatActivity {
                 "Major 7th"};
         if (isAbove) return intervalArray[index - 1] + " Above";
         else return intervalArray[index - 1] + " Below";
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(IntervalTrainingActivity.this, MainActivity.class));
     }
 }

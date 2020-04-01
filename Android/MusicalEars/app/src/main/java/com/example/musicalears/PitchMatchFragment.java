@@ -24,11 +24,15 @@ import static com.example.musicalears.Note.adjustedIntervalNoteList;
 import static com.example.musicalears.Note.adjustedNoteList;
 
 public class PitchMatchFragment extends Fragment {
-    private static final String PARAM_PARENT_ACTIVITY = "param1";
-    private static final String PARAM_IS_DISABLED = "param2";
+    private static final String PARAM_DURATION = "duration";
+    private static final String PARAM_SHOULD_SHOW_NOTE_NAME = "showName";
+    private static final String PARAM_IS_DISABLED = "isDisabled";
+    private static final String PARAM_PARENT_ACTIVITY = "parent";
 
-    private String parentActivity;
-    private String isFragmentDisabled;
+    private long paramDuration;
+    private boolean paramShouldShowNoteName;
+    private boolean paramIsDisabled;
+    private String paramParentActivity;
 
     private ImageView noteBubble;
     private TextView noteText;
@@ -53,10 +57,12 @@ public class PitchMatchFragment extends Fragment {
         // Required empty public constructor
     }
 
-    static PitchMatchFragment newInstance(String parentActivity, String isFragmentDisabled) {
+    static PitchMatchFragment newInstance(long duration, boolean showNote, boolean isDisabled, String parentActivity) {
         PitchMatchFragment fragment = new PitchMatchFragment();
         Bundle args = new Bundle();
-        args.putString(PARAM_IS_DISABLED, isFragmentDisabled);
+        args.putLong(PARAM_DURATION, duration);
+        args.putBoolean(PARAM_SHOULD_SHOW_NOTE_NAME, showNote);
+        args.putBoolean(PARAM_IS_DISABLED, isDisabled);
         args.putString(PARAM_PARENT_ACTIVITY, parentActivity);
         fragment.setArguments(args);
         return fragment;
@@ -98,9 +104,9 @@ public class PitchMatchFragment extends Fragment {
         }
     }
 
-    private void startTimer(long duration, final boolean scorePoint) {
+    private void startTimer(final boolean scorePoint) {
         if (accuracyTimer == null) {
-            accuracyTimer = new CountDownTimer(duration, 300) {
+            accuracyTimer = new CountDownTimer(paramDuration, 300) {
                 @Override
                 public void onTick(long l) {}
 
@@ -124,7 +130,7 @@ public class PitchMatchFragment extends Fragment {
                     progressBar.setLayoutParams(progressBarLayoutParams);
                 }
             });
-            progressBarAnimator.setDuration(duration);
+            progressBarAnimator.setDuration(paramDuration);
             progressBarAnimator.start();
         }
     }
@@ -156,14 +162,11 @@ public class PitchMatchFragment extends Fragment {
 
     private void scorePointAndReset() {
         shouldListen = false;
-        switch (parentActivity) {
-            case "interval":
-                ((IntervalTrainingActivity) Objects.requireNonNull(getActivity())).switchFragments();
-                ((IntervalTrainingActivity)getActivity()).scorePointAndReset();
-                break;
-            case "pitch":
-                ((PitchMatchingActivity) Objects.requireNonNull(getActivity())).scorePointAndReset();
-                break;
+        if (paramParentActivity.equals("interval")) {
+            ((IntervalTrainingActivity) Objects.requireNonNull(getActivity())).switchFragments();
+            ((IntervalTrainingActivity)getActivity()).scorePointAndReset();
+        } else {
+            ((PitchMatchingActivity) Objects.requireNonNull(getActivity())).scorePointAndReset();
         }
     }
 
@@ -199,29 +202,29 @@ public class PitchMatchFragment extends Fragment {
         if (noteBubbleTransition != null) {
             noteBubbleTransition = null;
         } else {
-            moveBubble(finalFrequency, finalIndex, list, shouldScorePoint);
+            moveBubble(finalFrequency, finalIndex, list);
         }
 
-        long duration;
-        if (parentActivity.equals("interval")) {
-            if (shouldScorePoint) {
-                duration = 2000;
-            } else {
-                duration = 1000;
-            }
-        } else {
-            duration = 3000;
-        }
+//        long duration;
+//        if (paramParentActivity.equals("interval")) {
+//            if (shouldScorePoint) {
+//                duration = 2000;
+//            } else {
+//                duration = 1000;
+//            }
+//        } else {
+//            duration = 3000;
+//        }
         if (checkAccuracy(frequency)) {
             noteBubble.setImageResource(R.drawable.note_bubble_on);
-            startTimer(duration, shouldScorePoint);
+            startTimer(shouldScorePoint);
         } else {
             noteBubble.setImageResource(R.drawable.note_bubble_off);
             stopTimer();
         }
     }
 
-    private void moveBubble(float frequency, int index, List<Note> list, boolean shouldScorePoint) {
+    private void moveBubble(float frequency, int index, List<Note> list) {
         final float upperBoundsFrequency = list.get(7).getNoteFrequency();
         final float lowerBoundsFrequency = list.get(3).getNoteFrequency();
         if (frequency < list.get(0).getNoteFrequency()) {
@@ -246,7 +249,7 @@ public class PitchMatchFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (isFragmentDisabled.equals("true")) {
+        if (paramIsDisabled) {
             noteBubble.setAlpha(.3f);
             targetView.setAlpha(.2f);
             disableSelf();
@@ -257,8 +260,10 @@ public class PitchMatchFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            parentActivity = getArguments().getString(PARAM_PARENT_ACTIVITY);
-            isFragmentDisabled = getArguments().getString(PARAM_IS_DISABLED);
+            paramDuration = getArguments().getLong(PARAM_DURATION);
+            paramShouldShowNoteName = getArguments().getBoolean(PARAM_SHOULD_SHOW_NOTE_NAME);
+            paramParentActivity = getArguments().getString(PARAM_PARENT_ACTIVITY);
+            paramIsDisabled = getArguments().getBoolean(PARAM_IS_DISABLED);
         }
     }
 
@@ -280,7 +285,7 @@ public class PitchMatchFragment extends Fragment {
 
     void setTargetNote(TargetNote target) {
         targetNote = target;
-        targetNoteText.setText(targetNote.getNoteName());
+        if (paramShouldShowNoteName) targetNoteText.setText(targetNote.getNoteName());
     }
 
     void setShouldListen(boolean shouldListen) {
