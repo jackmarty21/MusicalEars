@@ -63,7 +63,7 @@ class IntervalViewController: UIViewController {
     var heightBottom = CGFloat()
     var widthBottom = CGFloat()
     
-    var intervalNames = ["Minor Second", "Major Second", "Minor Third", "Major Third", "Perfect Fourth", "Tritone", "Perfect Fifth", "Minor Sixth", "Major Sixth", "Minor Seventh", "Major Seventh"]
+    var intervalNames = ["Minor 2nd", "Major 2nd", "Minor 3rd", "Major 3rd", "Perfect 4th", "Tritone", "Perfect 5th", "Minor 6th", "Major 6th", "Minor 7th", "Major 7th"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
