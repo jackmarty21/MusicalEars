@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!--    <color name="colorPrimary">#5CC8F2</color>-->
+    <color name="colorPrimary">#6B4675</color>
     <color name="colorPrimaryDark">#120F1C</color>
-    <color name="colorAccent">#3FBF04</color>
+    <color name="colorAccent">#6B4675</color>
+    <color name="colorAccentGreen">#3FBF04</color>
 
     <!--    same as primaryDark, only 30% saturated-->
     <color name="colorPrimaryDarkTransparent">#4D120F1C</color>
-
-    <color name="colorPrimary">#6B4675</color>
 </resources>

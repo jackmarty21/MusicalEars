@@ -1,13 +1,32 @@
 <resources>
-    <string name="action_settings">Settings</string>
+    <string name="settings">Settings</string>
     <string name="play_button">play button</string>
     <string name="_0_pts">0 pts</string>
     <string name="note_bubble">note bubble</string>
     <string name="_00_00">00:00</string>
-    <string name="pitchMatching">Pitch Matching</string>
-    <string name="intervalTraining">Interval Training</string>
+    <string name="pitch_matching">Pitch Matching</string>
+    <string name="interval_training">Interval Training</string>
     <string name="mic_icon">mic icon</string>
     <string name="skip">skip</string>
     <string name="musical_ears">Musical Ears</string>
-    <string name="welcome_text">Choose a module to get started.</string>
+
+    <string name="difficulty">Difficulty</string>
+    <string name="note_names">Note Names</string>
+
+    <!-- Pitch Matching Preferences -->
+    <string name="pitch_matching_description">Match the target note, in any octave, to score points.</string>
+    <string name="numberOfNotes">Number of Notes</string>
+    <string name="show_note">Show target note name?</string>
+
+    <!-- Interval Training Preferences -->
+    <string name="interval_training_description">Match the base note and the interval note, in any octave, to score points.</string>
+    <string name="numberOfIntervals">Number of Intervals</string>
+    <string name="show_interval_note">Show interval note name?</string>
+    <string name="show_base_note">Show base note name?</string>
+    <string name="Short">short</string>
+    <string name="easy">easy</string>
+    <string name="medium">medium</string>
+    <string name="Long">long</string>
+    <string name="hard">hard</string>
+    <string name="start">start</string>
 </resources>
