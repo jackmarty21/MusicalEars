@@ -13,11 +13,12 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.musicalears.Fragment.PitchNoteFragment;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -34,9 +35,10 @@ import be.tarsos.dsp.pitch.PitchDetectionHandler;
 import be.tarsos.dsp.pitch.PitchDetectionResult;
 import be.tarsos.dsp.pitch.PitchProcessor;
 
-import static com.example.musicalears.Note.noteList;
-
 public class PitchMatchingActivity extends AppCompatActivity {
+    private static final double PROBABILITY_THRESHOLD = 0.85;
+    private static final double PITCH_THRESHOLD = 100;
+
     private static final String PARAM_NUM_NOTES = "numNotes";
     private static final String PARAM_DURATION = "duration";
     private static final String PARAM_SHOULD_SHOW_NOTE_NAME = "showName";
@@ -49,37 +51,37 @@ public class PitchMatchingActivity extends AppCompatActivity {
     private ImageView micView;
     private ImageView skipView;
 
-    private TargetNote targetNote = null;
+    private PitchNoteFragment pitchMatchFragment;
 
-    private int randomNoteIndex;
+    AudioDispatcher dispatcher = null;
+    PitchDetectionHandler pitchDetectionHandler = null;
 
-    private PitchMatchFragment pitchMatchFragment;
+    private long startTime;
+    private int paramNumNotes;
 
     private int score = 0;
-    private long startTime;
-
-    private int numNotes;
+    private int noteIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pitch_matching);
 
-        numNotes = Objects.requireNonNull(getIntent().getExtras()).getInt(PARAM_NUM_NOTES);
+        paramNumNotes = Objects.requireNonNull(getIntent().getExtras()).getInt(PARAM_NUM_NOTES);
         long paramDuration = getIntent().getExtras().getLong(PARAM_DURATION);
         boolean paramShouldShowNoteName = getIntent().getExtras().getBoolean(PARAM_SHOULD_SHOW_NOTE_NAME);
 
-        pitchMatchFragment = PitchMatchFragment.newInstance(paramDuration, paramShouldShowNoteName, false, "pitch");
+        pitchMatchFragment = PitchNoteFragment.newInstance(paramDuration, paramShouldShowNoteName);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentFrameLayout, pitchMatchFragment).commit();
 
-        scoreText = findViewById(R.id.scoreText);
         timerText = findViewById(R.id.timerText);
+        scoreText = findViewById(R.id.scoreText);
 
         ImageButton playButton = findViewById(R.id.playButton);
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                playRandomTone();
+                playTone();
             }
         });
 
@@ -87,14 +89,17 @@ public class PitchMatchingActivity extends AppCompatActivity {
         micView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (pitchMatchFragment.getTargetNote() == null) {
+                    return;
+                }
                 if (pitchMatchFragment.getShouldListen()) {
-                    pitchMatchFragment.setShouldListen(false);
                     micView.setImageResource(R.drawable.mic_off);
                     micView.setAlpha(0.5f);
-                } else if (targetNote != null) {
-                    pitchMatchFragment.setShouldListen(true);
+                    pitchMatchFragment.setShouldListen(false);
+                } else {
                     micView.setImageResource(R.drawable.mic_on);
                     micView.setAlpha(1f);
+                    pitchMatchFragment.setShouldListen(true);
                 }
             }
         });
@@ -102,10 +107,10 @@ public class PitchMatchingActivity extends AppCompatActivity {
         skipView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (targetNote != null) {
-                    targetNote = null;
+                if (pitchMatchFragment.getTargetNote() != null) {
+                    pitchMatchFragment.setTargetNote(-1);
                     micView.setAlpha(.5f);
-                    playRandomTone();
+                    playTone();
                 }
             }
         });
@@ -113,11 +118,20 @@ public class PitchMatchingActivity extends AppCompatActivity {
         checkPermissionsAndStart();
     }
 
+    private void checkPermissionsAndStart() {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(PitchMatchingActivity.this, new String[]{Manifest.permission.RECORD_AUDIO},
+                    PERMISSIONS_REQUEST_RECORD_AUDIO);
+        } else {
+            startApp();
+        }
+    }
+
     private void startApp() {
         startTimer(new Date().getTime());
-
-        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 1024, 0);
-        PitchDetectionHandler pitchDetectionHandler = new PitchDetectionHandler() {
+        dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050, 2048, 1);
+        pitchDetectionHandler = new PitchDetectionHandler() {
             @Override
             public void handlePitch(final PitchDetectionResult pitchDetectionResult, AudioEvent audioEvent) {
                 final float pitchInHz = pitchDetectionResult.getPitch();
@@ -126,12 +140,12 @@ public class PitchMatchingActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (pitchMatchFragment.getShouldListen() &&
-                                targetNote != null) {
-                            if (probability > .8) {
-                                pitchMatchFragment.processPitch(pitchInHz, true);
-                            } else {
-                                pitchMatchFragment.stopTimer();
+                        if (pitchInHz < PITCH_THRESHOLD) {
+                            pitchMatchFragment.stopTimer();
+                        } else if (probability > PROBABILITY_THRESHOLD) {
+                            if (pitchMatchFragment.getShouldListen() &&
+                                    pitchMatchFragment.getTargetNote() != null) {
+                                pitchMatchFragment.processPitch(pitchInHz);
                             }
                         }
                     }
@@ -139,11 +153,52 @@ public class PitchMatchingActivity extends AppCompatActivity {
             }
         };
 
-        AudioProcessor pitchProcessor = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pitchDetectionHandler);
+        AudioProcessor pitchProcessor = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 2048, pitchDetectionHandler);
         dispatcher.addAudioProcessor(pitchProcessor);
 
         Thread audioThread = new Thread(dispatcher, "Audio Thread");
         audioThread.start();
+    }
+
+    private void stopApp() {
+        dispatcher = null;
+        pitchDetectionHandler = null;
+    }
+
+    private void playTone() {
+        pitchMatchFragment.setShouldListen(false);
+        micView.setImageResource(R.drawable.mic_off);
+        micView.setAlpha(.5f);
+
+        if (pitchMatchFragment.getTargetNote() == null) {
+            int randomNoteIndex = (int) Math.floor(Math.random() * 22);
+            if (randomNoteIndex == noteIndex) {
+                playTone();
+            }
+            noteIndex = randomNoteIndex;
+            int adjustedIndex = (noteIndex + 8) % 12;
+
+            pitchMatchFragment.setTargetNote(adjustedIndex);
+            skipView.setAlpha(1f);
+        }
+
+        final int noteResource = getResources().getIdentifier("note" + noteIndex, "raw", getPackageName());
+
+        final MediaPlayer mp = MediaPlayer.create(PitchMatchingActivity.this, noteResource);
+        mp.start();
+
+        //prevents the app from 'listening' to itself
+        new Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        if (mp.isPlaying()) mp.stop();
+                        mp.reset();
+                        mp.release();
+                        pitchMatchFragment.setShouldListen(true);
+                        micView.setImageResource(R.drawable.mic_on);
+                        micView.setAlpha(1f);
+                    }
+                }, 2000);
     }
 
     private void startTimer(long time) {
@@ -157,59 +212,38 @@ public class PitchMatchingActivity extends AppCompatActivity {
         }, 0);
     }
 
-    private void setTargetNote() {
-        if (targetNote == null) {
-            randomNoteIndex = (int) Math.floor(Math.random()*22);
-
-            int adjustedRandomIndex = (randomNoteIndex + 8)%12;
-
-            targetNote = new TargetNote(
-                    noteList.get(adjustedRandomIndex).getNoteName(),
-                    noteList.get(adjustedRandomIndex).getNoteFrequency());
-            targetNote.adjustNotes(adjustedRandomIndex, false);
-            pitchMatchFragment.setTargetNote(targetNote);
-
-            skipView.setAlpha(1f);
-        }
-    }
-
-    private void playRandomTone() {
-        pitchMatchFragment.setShouldListen(false);
-        micView.setImageResource(R.drawable.mic_off);
-        micView.setAlpha(.5f);
-        setTargetNote();
-
-        final int noteResource = getResources().getIdentifier("note" + randomNoteIndex, "raw", getPackageName());
-
-        final MediaPlayer mp = MediaPlayer.create(PitchMatchingActivity.this, noteResource);
-        mp.start();
-
-        //prevents the app from 'listening' to itself
-        new Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        pitchMatchFragment.setShouldListen(true);
-                        micView.setImageResource(R.drawable.mic_on);
-                        micView.setAlpha(1f);
-                    }
-                }, 2000);
+    private void updateTimer() {
+        Date currentDate = new Date();
+        long currentTime = currentDate.getTime();
+        long elapsedTime = currentTime - startTime;
+        DateFormat dateFormatter = new SimpleDateFormat("mm:ss", Locale.US);
+        dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        timerText.setText(dateFormatter.format(elapsedTime));
     }
 
     public void scorePointAndReset() {
-        final MediaPlayer mp = MediaPlayer.create(PitchMatchingActivity.this, R.raw.success);
+        final MediaPlayer mp = MediaPlayer.create(this, R.raw.success);
         mp.start();
-        targetNote = null;
-        micView.setImageResource(R.drawable.mic_off);
-        micView.setAlpha(0.5f);
         score++;
         String text = score + " pts";
         scoreText.setText(text);
+        micView.setImageResource(R.drawable.mic_off);
+        micView.setAlpha(0.5f);
 
-        pitchMatchFragment.resetSelf(false);
+        pitchMatchFragment.resetSelf();
+        pitchMatchFragment.setShouldListen(false);
 
-        if (score == numNotes) {
+        new Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        if (mp.isPlaying()) mp.stop();
+                        mp.reset();
+                        mp.release();
+                    }
+                }, 3000);
+        if (score == paramNumNotes) {
             new AlertDialog.Builder(this)
-                    .setTitle("Congrats! You scored " + numNotes + " points in " + timerText.getText() + "!")
+                    .setTitle("Congrats! You scored " + score + " points in " + timerText.getText() + "!")
                     .setMessage("You will now be taken back to the main screen.")
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
@@ -221,44 +255,22 @@ public class PitchMatchingActivity extends AppCompatActivity {
         }
     }
 
-    private void checkPermissionsAndStart() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            //permission not granted
-            ActivityCompat.requestPermissions(PitchMatchingActivity.this, new String[] {Manifest.permission.RECORD_AUDIO},
-                    PERMISSIONS_REQUEST_RECORD_AUDIO);
-        } else {
-            //permission granted
-            startApp();
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //permission granted
                 startApp();
             } else {
-                //permission denied
                 pitchMatchFragment.disableSelf();
             }
         }
     }
 
-    private void updateTimer() {
-        Date currentDate = new Date();
-        long currentTime = currentDate.getTime();
-        long elapsedTime = currentTime - startTime;
-        DateFormat dateFormatter = new SimpleDateFormat("mm:ss", Locale.US);
-        dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-        timerText.setText(dateFormatter.format(elapsedTime));
-    }
-
     @Override
     public void onBackPressed() {
+        pitchMatchFragment.setTargetNote(-1);
+        stopApp();
         super.onBackPressed();
-        startActivity(new Intent(PitchMatchingActivity.this, MainActivity.class));
     }
 }

@@ -17,7 +17,7 @@
             android:name=".IntervalSettingsActivity"
             android:label="@string/interval_training"
             android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"></activity>
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".PitchSettingsActivity"
             android:label="@string/pitch_matching"
@@ -48,6 +48,7 @@
             android:label="@string/pitch_matching"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+        <activity android:name=".SettingsActivity" />
     </application>
 
 </manifest>
